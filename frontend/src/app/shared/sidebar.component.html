@@ -1,0 +1,46 @@
+<aside class="summary-sidebar bg-primary px-3 py-4 d-flex flex-column">
+  <div class="vh-100 position-relative">
+
+    <div class="position-fixed" style="width: 17rem;">
+      <span class="h1 my-5 text-white">Boisco Basket</span>
+
+      <nav class="nav flex-column gap-2 mt-5">
+        <a class="ps-1 text-white nav-link" routerLink="/adherents" routerLinkActive="active">Adhérents</a>
+        <a class="ps-1 text-white nav-link" routerLink="/planning" routerLinkActive="active">Planning</a>
+        <a class="ps-1 text-white nav-link" routerLink="/tresorerie" routerLinkActive="active">Trésorerie</a>
+      </nav>
+
+    </div>
+
+    <!-- ── Todo list ─────────────────────────────────────────────────── -->
+    <div class="todo-widget mt-auto pt-4 position-fixed bottom-0 mb-3" style="width: 17rem;">
+      <div class="small text-uppercase text-white-50 mb-2">À faire</div>
+
+      <form class="d-flex gap-2 mb-2" (ngSubmit)="addTodo()">
+        <input type="text" class="form-control form-control-sm" placeholder="Ajouter une tâche…" name="newTodo"
+          [(ngModel)]="newTodo">
+        <button type="submit" class="btn btn-sm btn-light text-primary" [disabled]="!newTodo.trim()">+</button>
+      </form>
+
+      <ul class="list-unstyled todo-list mb-0">
+        @for (todo of todos(); track todo.id) {
+        <li class="d-flex align-items-center gap-2 py-1">
+          <button type="button" class="todo-check" [class.checked]="todo.done"
+            [attr.aria-label]="todo.done ? 'Marquer comme non terminée' : 'Marquer comme terminée'"
+            (click)="toggleTodo(todo.id)">
+          </button>
+          <span class="todo-text flex-grow-1 text-white" [class.text-decoration-line-through]="todo.done"
+            [class.text-white-50]="todo.done">
+            {{ todo.text }}
+          </span>
+          <button type="button" class="todo-remove btn-close btn-close-white" aria-label="Supprimer"
+            (click)="removeTodo(todo.id)">
+          </button>
+        </li>
+        } @empty {
+        <li class="text-white-50 small py-1">Aucune tâche pour l'instant.</li>
+        }
+      </ul>
+    </div>
+  </div>
+</aside>

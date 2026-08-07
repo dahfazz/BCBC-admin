@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  padding-bottom: 80px;
+  padding-right: 420px;
+}
+
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 420px;
+  background: #fff;
+  border-top: 1px solid #dee2e6;
+  padding: 12px 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 1030;
+}
+
+.invoices-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  background: #f8f9fa;
+  border-left: 1px solid #dee2e6;
+  padding: 20px 16px;
+  overflow-y: auto;
+  z-index: 1020;
+}
+
+.invoices-list {
+  margin: 0;
+
+  .invoice-link {
+    display: block;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    word-break: break-all;
+    color: #212529;
+    text-decoration: none;
+
+    &:hover {
+      background: #e9ecef;
+      color: var(--bs-primary);
+    }
+  }
+
+  .invoice-email-btn {
+    flex: 0 0 auto;
+    padding: 2px 6px;
+  }
+}
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1055;
+}
+
+.modal.d-block {
+  z-index: 1060;
+}

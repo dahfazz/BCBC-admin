@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  flex: 1;
+}
+
+.members-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1055;
+}
+
+.modal.d-block {
+  z-index: 1060;
+}
+
+.btn-icon-square {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 !important;
+}
+
+.avatar {
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  color: var(--bs-primary);
+  background-color: rgba(var(--bs-primary-rgb), .1);
+}

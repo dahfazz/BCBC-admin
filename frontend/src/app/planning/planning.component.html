@@ -1,0 +1,49 @@
+<app-sidebar></app-sidebar>
+
+<div class="app-container planning-main p-5">
+  <h1 class="mb-1">Planning</h1>
+  <div class="text-muted mb-4">{{ seasonLabel }}</div>
+
+  <div class="planning-weeks d-flex flex-column gap-3">
+    @for (week of weeks; track week.weekStart.getTime()) {
+      <div class="card shadow-sm">
+        <div class="card-header bg-white fw-semibold">
+          {{ formatWeekRange(week) }}
+        </div>
+        <ul class="list-group list-group-flush">
+          @for (session of week.sessions; track session.date.getTime() + session.category) {
+            @let vacation = vacationLabel(session);
+            <li class="list-group-item d-flex align-items-center gap-3" [class.session-vacation]="vacation">
+              <span class="badge rounded-pill text-bg-light day-badge">
+                {{ session.dayLabel }} <span class="fw-normal">{{ formatSessionDate(session) }}</span>
+              </span>
+              <span class="text-nowrap time-range ml-2">{{ session.startTime }} – {{ session.endTime }}</span>
+              <span class="badge rounded-pill" [ngClass]="session.type === 'match' ? 'text-bg-danger' : 'text-bg-primary'">
+                {{ session.type === 'match' ? 'Match' : 'Séance' }} | {{ session.label }}
+              </span>
+              @if (session.type === 'match') {
+                <span>Match contre <strong>{{ session.opponent }}</strong></span>
+              } @else if (session.coach) {
+                <span class="text-muted">Entraîneur : {{ session.coach }}</span>
+              }
+              @if (vacation) {
+                <span class="badge text-bg-light ms-auto">{{ vacation }}</span>
+              }
+            </li>
+          }
+        </ul>
+        <div class="card-footer bg-white">
+          <label class="form-label small text-muted mb-1" [for]="'note-' + weekKey(week)">
+            Note...
+          </label>
+          <input
+            [id]="'note-' + weekKey(week)"
+            type="text"
+            class="form-control form-control-sm"
+            [ngModel]="notes()[weekKey(week)] ?? ''"
+            (ngModelChange)="updateNote(week, $event)">
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  flex: 1;
+}
+
+.planning-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.day-badge {
+  width: 6.4rem;
+  text-align: center;
+}
+
+.time-range {
+  width: 8.5rem;
+  color: var(--bs-secondary-color);
+}
+
+.session-vacation {
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-secondary-color);
+  .day-badge {
+    text-decoration: line-through;
+  }
+
+  .badge {
+    opacity: 0.6;
+  }
+}

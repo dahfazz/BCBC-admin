@@ -1,0 +1,280 @@
+<div class="app-container px-4 py-4">
+
+  <div class="d-flex align-items-center justify-content-between mb-4 gap-3">
+    <h1 class="fw-bold mb-0" style="font-size:1.4rem">Générer une facture</h1>
+    <a routerLink="/adherents" class="btn btn-outline-secondary btn-sm">&larr; Retour aux adhérents</a>
+  </div>
+
+  @if (selectedMember(); as member) {
+    <div class="alert alert-info d-flex align-items-center gap-2">
+      <span>Facture pour l'adhérent : <strong>{{ member.prenom }} {{ member.nom }}</strong>
+        @if (member.categorie) { <span> — {{ member.categorie }}</span> }
+      </span>
+    </div>
+  }
+
+  @if (saved()) {
+    <div class="alert alert-success d-flex align-items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </svg>
+      <span>Reçu enregistré : <strong>{{ savedFilename() }}</strong></span>
+    </div>
+  }
+  @if (error()) {
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <form id="invoiceForm" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+    <!-- ── Informations du reçu ──────────────────────────────────────── -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold bg-light">Informations du reçu</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">N° de reçu</label>
+            <input class="form-control bg-light fw-bold" formControlName="invoiceNumber" readonly>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Saison <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="season" placeholder="2026/2027"
+                   [class.is-invalid]="isInvalid('season')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="date"
+                   [class.is-invalid]="isInvalid('date')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Parent / Payeur ────────────────────────────────────────────── -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold bg-light">Parent / Payeur</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nom <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="parentLastName" placeholder="Nom du parent"
+                   [class.is-invalid]="isInvalid('parentLastName')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Prénom <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="parentFirstName" placeholder="Prénom du parent"
+                   [class.is-invalid]="isInvalid('parentFirstName')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Adresse <span class="text-danger">*</span></label>
+            <textarea class="form-control" formControlName="parentAddress" placeholder="Adresse postale"
+                   [class.is-invalid]="isInvalid('parentAddress')"></textarea>
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Code postal <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="parentPostalCode" placeholder="Code postal"
+                   [class.is-invalid]="isInvalid('parentPostalCode')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Ville <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="parentCity" placeholder="Ville"
+                   [class.is-invalid]="isInvalid('parentCity')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Enfant / Adhérent ──────────────────────────────────────────── -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold bg-light">Enfant / Adhérent</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Nom <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="childLastName" placeholder="Nom de l'enfant"
+                   [class.is-invalid]="isInvalid('childLastName')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Prénom <span class="text-danger">*</span></label>
+            <input class="form-control" formControlName="childFirstName" placeholder="Prénom de l'enfant"
+                   [class.is-invalid]="isInvalid('childFirstName')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Formule & Section ──────────────────────────────────────────── -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold bg-light">Formule & Section</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Date début formule <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="formulaStartDate"
+                   [class.is-invalid]="isInvalid('formulaStartDate')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Date fin formule <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="formulaEndDate"
+                   [class.is-invalid]="isInvalid('formulaEndDate')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Section <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="section"
+                   [class.is-invalid]="isInvalid('section')">
+              <option value="">Sélectionnez une section</option>
+              @for (cat of categories; track cat) {
+                <option [value]="cat">{{ cat }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Paiement ───────────────────────────────────────────────────── -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold bg-light">Paiement</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Moyen de paiement <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="paymentMethod"
+                   [class.is-invalid]="isInvalid('paymentMethod')">
+                    <option value="Virement">Virement</option>
+                    <option value="CB en ligne">CB en ligne</option>
+                  </select>
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Montant réglé (€) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" formControlName="amountPaid"
+                   min="0" step="0.01"
+                   [class.is-invalid]="isInvalid('amountPaid')">
+            <div class="invalid-feedback">Champ obligatoire</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- ── Fixed right sidebar: generated invoices ─────────────────────────── -->
+<aside class="invoices-sidebar bg-white border-start">
+  <div class="fw-semibold mb-2">Factures générées</div>
+  <input
+    type="search"
+    class="form-control form-control-sm mb-3"
+    placeholder="Rechercher par nom de fichier…"
+    [value]="invoiceSearch()"
+    (input)="invoiceSearch.set($any($event.target).value)">
+
+  @if (filteredInvoices().length === 0) {
+    <div class="text-muted small">Aucune facture trouvée.</div>
+  }
+  <ul class="list-unstyled invoices-list">
+    @for (file of filteredInvoices(); track file) {
+      <li class="mb-1 d-flex align-items-center gap-1">
+        <a [href]="invoiceUrl(file)" target="_blank" rel="noopener" class="invoice-link flex-grow-1">{{ file }}</a>
+        <button type="button" class="btn btn-sm btn-outline-secondary invoice-email-btn" title="Envoyer par email"
+                (click)="openEmailModal(file)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+          </svg>
+        </button>
+      </li>
+    }
+  </ul>
+</aside>
+
+<!-- ── Send invoice by email modal ──────────────────────────────────────── -->
+@if (emailModalOpen()) {
+  <div class="modal-backdrop-custom" (click)="closeEmailModal()"></div>
+  <div class="modal d-block" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Envoyer la facture par email</h5>
+          <button type="button" class="btn-close" aria-label="Fermer" (click)="closeEmailModal()"></button>
+        </div>
+        <div class="modal-body">
+          @if (emailSent()) {
+            <div class="alert alert-success mb-0">Email envoyé avec succès.</div>
+          } @else {
+            @if (emailError()) {
+              <div class="alert alert-warning">{{ emailError() }}</div>
+            }
+            <div class="mb-3">
+              <label class="form-label">Pièce jointe</label>
+              <input class="form-control bg-light" [value]="emailModalFile()" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Expéditeur</label>
+              <input class="form-control bg-light" value="bcbc92270@gmail.com" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Destinataire <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" placeholder="email@exemple.com"
+                     [value]="emailTo()" (input)="emailTo.set($any($event.target).value)">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Sujet</label>
+              <input class="form-control" [value]="emailSubject()"
+                     (input)="emailSubject.set($any($event.target).value)">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea class="form-control" rows="6" [value]="emailBody()"
+                        (input)="emailBody.set($any($event.target).value)"></textarea>
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeEmailModal()">Fermer</button>
+          @if (!emailSent()) {
+            <button type="button" class="btn btn-primary" [disabled]="emailSending()" (click)="sendInvoiceEmail()">
+              @if (emailSending()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Envoi en cours…
+              } @else {
+                Envoyer
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Fixed footer ──────────────────────────────────────────────────── -->
+<footer class="fixed-footer">
+  <div class="container d-flex justify-content-end">
+    <button type="submit" form="invoiceForm" class="btn btn-primary btn-lg px-5" [disabled]="saving()">
+      @if (saving()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Génération en cours…
+      } @else {
+        Générer la facture PDF
+      }
+    </button>
+  </div>
+</footer>
