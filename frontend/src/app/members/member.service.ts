@@ -2,11 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Member, MemberInput } from './member.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class MemberService {
   private http = inject(HttpClient);
-  private readonly BASE = 'http://localhost:3000';
+  private readonly BASE = environment.apiUrl;
   private readonly API = `${this.BASE}/api/members`;
 
   list(): Observable<{ members: Member[] }> {

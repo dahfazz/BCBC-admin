@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import jsPDF from 'jspdf';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface InvoiceData {
   invoiceNumber: string;
@@ -26,7 +27,7 @@ export interface InvoiceData {
 @Injectable({ providedIn: 'root' })
 export class InvoiceService {
   private http = inject(HttpClient);
-  private readonly BASE = 'http://localhost:3000';
+  private readonly BASE = environment.apiUrl;
   private readonly API = `${this.BASE}/api/save-invoice`;
   private tamponBase64 = '';
 
