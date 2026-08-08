@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'bcbc-admin-xo9z:10000',
+  apiUrl: 'http://bcbc-admin-xo9z:10000',
 };
