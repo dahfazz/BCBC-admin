@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://bcbc-admin-backend.onrender.com',
+  apiUrl: 'bcbc-admin-xo9z:10000',
 };
