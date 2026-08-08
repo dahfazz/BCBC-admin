@@ -5,8 +5,10 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const cors = require('cors')
 
 const app = express();
+app.use(cors())
 const PORT = 3000;
 const INVOICES_DIR = path.resolve(__dirname, '..', 'generated-invoices');
 const DATA_DIR = path.resolve(__dirname, 'data');

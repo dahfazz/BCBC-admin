@@ -6,9 +6,11 @@
     "dev": "node --watch server.js"
   },
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^4.19.2",
     "nodemailer": "^9.0.3"
+  },
+  "devDependencies": {
+    "cors": "^2.8.6"
   }
 }
