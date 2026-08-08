@@ -1,5 +1,6 @@
 {
-  "name": "bcbc-invoicing",
+  "name": "bcbc-admin",
+  "license": "MIT",
   "version": "1.0.0",
   "scripts": {
     "frontend": "npm run --prefix frontend start",
