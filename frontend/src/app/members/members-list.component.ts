@@ -17,6 +17,10 @@ export class MembersListComponent implements OnInit {
   private memberService = inject(MemberService);
   private router = inject(Router);
 
+  public MISSING_DATES = 'missing-date';
+  public MISSING_PAYMENTS = 'missing-payments';
+  public FEMALES = 'feminine-only';
+
   readonly categories = CATEGORIES;
 
   members = signal<Member[]>([]);
@@ -28,13 +32,23 @@ export class MembersListComponent implements OnInit {
     const term = this.searchTerm().trim().toLowerCase();
     const list = this.members();
     if (!term) return list;
-    return list
-      .sort((a: Member, b: Member) => a.nom.localeCompare(b.nom))
-      .filter((m) =>
-        `${m.nom} ${m.prenom} ${m.email} ${m.categorie} ${m.numeroLicenceFFBB}`
-          .toLowerCase()
-          .includes(term),
-      );
+
+    switch (term) {
+      case this.MISSING_DATES:
+        return list.filter((m) => !m.dateNaissance || m.dateNaissance.trim() === '');
+      case this.MISSING_PAYMENTS:
+        return list.filter((m) => m.cotisationDue > 0);
+      case this.FEMALES:
+        return list.filter((m) => m.sexe === 'F');
+      default:
+        return list
+          .sort((a: Member, b: Member) => a.nom.localeCompare(b.nom))
+          .filter((m) =>
+            `${m.nom} ${m.prenom} ${m.email} ${m.categorie} ${m.numeroLicenceFFBB}`
+              .toLowerCase()
+              .includes(term),
+          );
+    }
   });
 
   summary = computed(() => {
@@ -121,10 +135,15 @@ export class MembersListComponent implements OnInit {
     this.searchTerm.set(categorie);
   }
 
+  customFilter(term: string): void {
+    this.searchTerm.set(term);
+  }
+
   formatDate(isoDate: string): string {
     if (!isoDate) return '';
     const [y, m, d] = isoDate.split('-');
-    return y && m && d ? `${d}/${m}/${y}` : isoDate;
+    const age = new Date().getFullYear() - Number(y);
+    return y && m && d ? `${d}/${m}/${y} (${age} ans)` : isoDate;
   }
 
   isInvalid(ctrl: string): boolean {

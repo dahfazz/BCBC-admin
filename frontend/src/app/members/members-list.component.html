@@ -9,12 +9,28 @@
   <h1 class="mb-5">Adhérents</h1>
 
   <!-- ── Recherche ──────────────────────────────────────────────────── -->
-  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-1">
     <input type="search" class="form-control w-50" placeholder="🔎 Rechercher" [value]="searchTerm()"
       (input)="searchTerm.set($any($event.target).value)">
     <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreatePanel()">+ Ajouter un
       adhérent</button>
   </div>
+
+  <ul class="nav mb-4">
+    <li class="nav-item">
+      <button type="button" class="px-0 me-3 nav-link text-decoration-underline"
+        (click)="customFilter(MISSING_DATES)">Dates de
+        naissance manquantes</button>
+    </li>
+    <li class="nav-item">
+      <button type="button" class="px-0 me-3 nav-link text-decoration-underline"
+        (click)="customFilter(MISSING_PAYMENTS)">Cotisations incomplètes</button>
+    </li>
+    <li class="nav-item">
+      <button type="button" class="px-0 me-3 nav-link text-decoration-underline"
+        (click)="customFilter(FEMALES)">Féminines</button>
+    </li>
+  </ul>
 
   <!-- ── Tableau des adhérents ──────────────────────────────────────── -->
   <div class="" style="overflow-x: auto; max-height: 600px;">
@@ -23,7 +39,7 @@
         <colgroup>
           <col style="width: 8%"> <!-- # -->
           <col style="width: 28%"> <!-- Nom -->
-          <col style="width: 11%"> <!-- Date -->
+          <col style="width: 20%"> <!-- Date -->
           <col style="width: 6%"> <!-- Cat. -->
           <col style="width: 26%"> <!-- Email -->
           <col style="width: 11%"> <!-- Dû -->
@@ -56,7 +72,8 @@
               <span class="ms-2 my-2 avatar badge rounded-pill">{{ getMemberLetters(member) }}</span>
             </td>
             <td class="text-truncate">
-              <button type="button" class="btn btn-link p-0 text-reset text-decoration-none member-name-btn d-flex align-items-center"
+              <button type="button"
+                class="btn btn-link p-0 text-reset text-decoration-none member-name-btn d-flex align-items-center"
                 (click)="openMemberPanel(member)">
                 <span>{{ member.prenom }} {{ member.nom }}</span>
                 <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe }}</span>
@@ -72,8 +89,9 @@
               }{{ formatDate(member.dateNaissance) }}
             </td>
             <td class="text-truncate text-center">
-              <button (click)="filterByCat(member.categorie)" type="button" class="w-100 d-block btn btn-sm btn-success" title="Catégorie" aria-label="Catégorie">{{
-                member.categorie }}</button>
+              <button (click)="filterByCat(member.categorie)" type="button"
+                class="w-100 d-block align-self-center btn btn-sm btn-success" title="Catégorie" aria-label="Catégorie">
+                <small>{{member.categorie }}</small></button>
             </td>
             <td class="text-truncate"><a href="mailto:{{ member.email }}">{{ member.email }}</a></td>
             <td class="text-end">
