@@ -28,19 +28,22 @@ export class MembersListComponent implements OnInit {
     const term = this.searchTerm().trim().toLowerCase();
     const list = this.members();
     if (!term) return list;
-    return list.filter((m) =>
-      `${m.nom} ${m.prenom} ${m.email} ${m.categorie} ${m.numeroLicenceFFBB}`
-        .toLowerCase()
-        .includes(term),
-    );
+    return list
+      .sort((a: Member, b: Member) => a.nom.localeCompare(b.nom))
+      .filter((m) =>
+        `${m.nom} ${m.prenom} ${m.email} ${m.categorie} ${m.numeroLicenceFFBB}`
+          .toLowerCase()
+          .includes(term),
+      );
   });
 
   summary = computed(() => {
     const list = this.members();
+    const filteredList = this.filteredMembers();
     const totalPaid = list.reduce((sum, m) => sum + (Number(m.cotisationPayee) || 0), 0);
     const totalDue = list.reduce((sum, m) => sum + (Number(m.cotisationDue) || 0), 0);
     return {
-      total: list.length,
+      total: filteredList.length,
       totalPaid,
       totalDue,
       totalCotisations: totalPaid + totalDue,
@@ -112,6 +115,10 @@ export class MembersListComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  filterByCat(categorie: string): void {
+    this.searchTerm.set(categorie);
   }
 
   formatDate(isoDate: string): string {

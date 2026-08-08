@@ -3,20 +3,17 @@
 <div class="app-container members-main p-5">
 
   @if (loadError()) {
-    <div class="alert alert-warning">{{ loadError() }}</div>
+  <div class="alert alert-warning">{{ loadError() }}</div>
   }
 
   <h1 class="mb-5">Adhérents</h1>
 
   <!-- ── Recherche ──────────────────────────────────────────────────── -->
-  <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
-      <input
-        type="search"
-        class="form-control w-50"
-        placeholder="🔎 Rechercher"
-        [value]="searchTerm()"
-        (input)="searchTerm.set($any($event.target).value)">
-    <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreateModal()">+ Ajouter un adhérent</button>
+  <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <input type="search" class="form-control w-50" placeholder="🔎 Rechercher" [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)">
+    <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreateModal()">+ Ajouter un
+      adhérent</button>
   </div>
 
   <!-- ── Tableau des adhérents ──────────────────────────────────────── -->
@@ -45,46 +42,55 @@
         </thead>
         <tbody>
           @if (loading()) {
-            <tr><td colspan="9" class="text-center text-muted py-4">Chargement…</td></tr>
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">Chargement…</td>
+          </tr>
           } @else if (filteredMembers().length === 0) {
-            <tr><td colspan="9" class="text-center text-muted py-4">Aucun adhérent trouvé.</td></tr>
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">Aucun adhérent trouvé.</td>
+          </tr>
           } @else {
-            @for (member of filteredMembers(); track member.id) {
-              <tr>
-                <td class="text-truncate text-center">
-                  <span class="ms-2 avatar badge rounded-pill">{{ getMemberLetters(member) }}</span>
-                </td>
-                <td class="text-truncate">
-                  <div class="d-flex align-items-center">
-                    {{ member.prenom }} {{ member.nom }} <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe }}</span>
-                  </div>
-                </td>
-                <td class="text-truncate">
-                  @if (!member.dateNaissance) {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-                         class="text-warning me-1" viewBox="0 0 16 16"
-                         title="Date de naissance inconnue">
-                      <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                    </svg>
-                  }{{ formatDate(member.dateNaissance) }}
-                </td>
-                <td class="text-truncate text-center">{{ member.categorie }}</td>
-                <td class="text-truncate"><a href="mailto:{{ member.email }}">{{ member.email }}</a></td>
-                <td class="text-end">
-                  @if (member.cotisationDue > 0) {
-                    {{ member.cotisationDue | number:'1.2-2' }} €
-                  } @else {-}
-                </td>
-                <td class="text-end text-nowrap">
-                  <button type="button" class="btn btn-outline-secondary btn-icon-square"
-                          title="Modifier" aria-label="Modifier" (click)="openEditModal(member)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            }
+          @for (member of filteredMembers(); track member.id) {
+          <tr>
+            <td class="text-truncate text-center">
+              <span class="ms-2 my-2 avatar badge rounded-pill">{{ getMemberLetters(member) }}</span>
+            </td>
+            <td class="text-truncate">
+              <div class="d-flex align-items-center">
+                {{ member.prenom }} {{ member.nom }} <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe
+                  }}</span>
+              </div>
+            </td>
+            <td class="text-truncate">
+              @if (!member.dateNaissance) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                class="text-warning me-1" viewBox="0 0 16 16" title="Date de naissance inconnue">
+                <path
+                  d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+              </svg>
+              }{{ formatDate(member.dateNaissance) }}
+            </td>
+            <td class="text-truncate text-center">
+              <button (click)="filterByCat(member.categorie)" type="button" class="w-100 d-block btn btn-sm btn-success" title="Catégorie" aria-label="Catégorie">{{
+                member.categorie }}</button>
+            </td>
+            <td class="text-truncate"><a href="mailto:{{ member.email }}">{{ member.email }}</a></td>
+            <td class="text-end">
+              @if (member.cotisationDue > 0) {
+              {{ member.cotisationDue | number:'1.2-2' }} €
+              } @else {-}
+            </td>
+            <td class="text-end text-nowrap">
+              <button type="button" class="btn btn-outline-secondary btn-icon-square" title="Modifier"
+                aria-label="Modifier" (click)="openEditModal(member)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path
+                    d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+          }
           }
         </tbody>
       </table>
@@ -97,128 +103,129 @@
 
 <!-- ── Add/Edit member modal ────────────────────────────────────────── -->
 @if (modalOpen()) {
-  <div class="modal-backdrop-custom" (click)="closeModal()"></div>
-  <div class="modal d-block" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" (click)="$event.stopPropagation()">
-      <div class="modal-content">
-        <form [formGroup]="form" (ngSubmit)="saveMember()" novalidate>
-          <div class="modal-header">
-            <h5 class="modal-title">{{ editingId() ? 'Modifier l’adhérent' : 'Ajouter un adhérent' }}</h5>
-            <button type="button" class="btn-close" aria-label="Fermer" (click)="closeModal()"></button>
-          </div>
-          <div class="modal-body">
-            @if (formError()) {
-              <div class="alert alert-warning">{{ formError() }}</div>
-            }
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">Nom <span class="text-danger">*</span></label>
-                <input class="form-control" formControlName="nom" [class.is-invalid]="isInvalid('nom')">
-                <div class="invalid-feedback">Champ obligatoire</div>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Prénom <span class="text-danger">*</span></label>
-                <input class="form-control" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
-                <div class="invalid-feedback">Champ obligatoire</div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Sexe <span class="text-danger">*</span></label>
-                <select class="form-select" formControlName="sexe" [class.is-invalid]="isInvalid('sexe')">
-                  <option value="">Sélectionnez</option>
-                  <option value="F">Féminin</option>
-                  <option value="M">Masculin</option>
-                </select>
-                <div class="invalid-feedback">Champ obligatoire</div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Date de naissance <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" formControlName="dateNaissance"
-                       [class.is-invalid]="isInvalid('dateNaissance')">
-                <div class="invalid-feedback">Champ obligatoire</div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Catégorie <span class="text-danger">*</span></label>
-                <select class="form-select" formControlName="categorie" [class.is-invalid]="isInvalid('categorie')">
-                  <option value="">Sélectionnez</option>
-                  @for (cat of categories; track cat) {
-                    <option [value]="cat">{{ cat }}</option>
-                  }
-                </select>
-                <div class="invalid-feedback">Champ obligatoire</div>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" formControlName="email" [class.is-invalid]="isInvalid('email')">
-                <div class="invalid-feedback">Email invalide</div>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Téléphone</label>
-                <input class="form-control" formControlName="telephone">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Cotisation payée (€) <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" formControlName="cotisationPayee" min="0" step="0.01"
-                       [class.is-invalid]="isInvalid('cotisationPayee')">
-                <div class="invalid-feedback">Valeur invalide</div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Cotisation due (€) <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" formControlName="cotisationDue" min="0" step="0.01"
-                       [class.is-invalid]="isInvalid('cotisationDue')">
-                <div class="invalid-feedback">Valeur invalide</div>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">N° licence FFBB</label>
-                <input class="form-control" formControlName="numeroLicenceFFBB">
-              </div>
+<div class="modal-backdrop-custom" (click)="closeModal()"></div>
+<div class="modal d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="saveMember()" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingId() ? 'Modifier l’adhérent' : 'Ajouter un adhérent' }}</h5>
+          <button type="button" class="btn-close" aria-label="Fermer" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          @if (formError()) {
+          <div class="alert alert-warning">{{ formError() }}</div>
+          }
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nom <span class="text-danger">*</span></label>
+              <input class="form-control" formControlName="nom" [class.is-invalid]="isInvalid('nom')">
+              <div class="invalid-feedback">Champ obligatoire</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Prénom <span class="text-danger">*</span></label>
+              <input class="form-control" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
+              <div class="invalid-feedback">Champ obligatoire</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Sexe <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="sexe" [class.is-invalid]="isInvalid('sexe')">
+                <option value="">Sélectionnez</option>
+                <option value="F">Féminin</option>
+                <option value="M">Masculin</option>
+              </select>
+              <div class="invalid-feedback">Champ obligatoire</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date de naissance <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" formControlName="dateNaissance"
+                [class.is-invalid]="isInvalid('dateNaissance')">
+              <div class="invalid-feedback">Champ obligatoire</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="categorie" [class.is-invalid]="isInvalid('categorie')">
+                <option value="">Sélectionnez</option>
+                @for (cat of categories; track cat) {
+                <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
+              <div class="invalid-feedback">Champ obligatoire</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" formControlName="email" [class.is-invalid]="isInvalid('email')">
+              <div class="invalid-feedback">Email invalide</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Téléphone</label>
+              <input class="form-control" formControlName="telephone">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Cotisation payée (€) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" formControlName="cotisationPayee" min="0" step="0.01"
+                [class.is-invalid]="isInvalid('cotisationPayee')">
+              <div class="invalid-feedback">Valeur invalide</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Cotisation due (€) <span class="text-danger">*</span></label>
+              <input type="number" class="form-control" formControlName="cotisationDue" min="0" step="0.01"
+                [class.is-invalid]="isInvalid('cotisationDue')">
+              <div class="invalid-feedback">Valeur invalide</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">N° licence FFBB</label>
+              <input class="form-control" formControlName="numeroLicenceFFBB">
             </div>
           </div>
-          <div class="modal-footer">
-            @if (editingMember(); as m) {
-              <button type="button" class="btn btn-outline-danger me-auto" (click)="confirmDelete(m)">Supprimer</button>
-              <button type="button" class="btn btn-outline-primary" (click)="generateInvoice(m)">Générer la facture</button>
+        </div>
+        <div class="modal-footer">
+          @if (editingMember(); as m) {
+          <button type="button" class="btn btn-outline-danger me-auto" (click)="confirmDelete(m)">Supprimer</button>
+          <button type="button" class="btn btn-outline-primary" (click)="generateInvoice(m)">Générer la facture</button>
+          }
+          <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            @if (saving()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            Enregistrement…
+            } @else {
+            Enregistrer
             }
-            <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Annuler</button>
-            <button type="submit" class="btn btn-primary" [disabled]="saving()">
-              @if (saving()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                Enregistrement…
-              } @else {
-                Enregistrer
-              }
-            </button>
-          </div>
-        </form>
-      </div>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
 }
 
 <!-- ── Delete confirmation modal ────────────────────────────────────── -->
 @if (deleteTarget(); as member) {
-  <div class="modal-backdrop-custom" (click)="cancelDelete()"></div>
-  <div class="modal d-block" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Supprimer l’adhérent</h5>
-          <button type="button" class="btn-close" aria-label="Fermer" (click)="cancelDelete()"></button>
-        </div>
-        <div class="modal-body">
-          Voulez-vous vraiment supprimer <strong>{{ member.prenom }} {{ member.nom }}</strong> ? Cette action est irréversible.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" (click)="cancelDelete()">Annuler</button>
-          <button type="button" class="btn btn-danger" [disabled]="deleting()" (click)="deleteMember()">
-            @if (deleting()) {
-              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-              Suppression…
-            } @else {
-              Supprimer
-            }
-          </button>
-        </div>
+<div class="modal-backdrop-custom" (click)="cancelDelete()"></div>
+<div class="modal d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Supprimer l’adhérent</h5>
+        <button type="button" class="btn-close" aria-label="Fermer" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer <strong>{{ member.prenom }} {{ member.nom }}</strong> ? Cette action est
+        irréversible.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancelDelete()">Annuler</button>
+        <button type="button" class="btn btn-danger" [disabled]="deleting()" (click)="deleteMember()">
+          @if (deleting()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Suppression…
+          } @else {
+          Supprimer
+          }
+        </button>
       </div>
     </div>
   </div>
+</div>
 }

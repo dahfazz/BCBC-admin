@@ -1,19 +1,23 @@
-<aside class="summary-sidebar bg-primary px-3 py-4 d-flex flex-column">
-  <div class="vh-100 position-relative">
+<aside class="summary-sidebar bg-primary d-flex flex-column">
+  <div class="vh-100 pb-4 position-relative">
 
-    <div class="position-fixed" style="width: 17rem;">
-      <span class="h1 my-5 text-white">Boisco Basket</span>
+    <div class="position-fixed" style="width: 300px;">
+      <a style="text-decoration: none; background: #00000020;" class="p-4 mb-4 d-block w-100 h1 text-white"
+        routerLink="/">Boisco Basket</a>
 
-      <nav class="nav flex-column gap-2 mt-5">
+      <nav class="nav flex-column gap-2 mx-4">
         <a class="ps-1 text-white nav-link" routerLink="/adherents" routerLinkActive="active">Adhérents</a>
         <a class="ps-1 text-white nav-link" routerLink="/planning" routerLinkActive="active">Planning</a>
         <a class="ps-1 text-white nav-link" routerLink="/tresorerie" routerLinkActive="active">Trésorerie</a>
+        <hr class="border-white border-lg" />
+        <a class="ps-1 text-white nav-link" href="https://extranet.ffbb.com/fbi/connexion.fbi" target="_blank"
+          rel="noopener noreferrer">FBI</a>
       </nav>
 
     </div>
 
     <!-- ── Todo list ─────────────────────────────────────────────────── -->
-    <div class="todo-widget mt-auto pt-4 position-fixed bottom-0 mb-3" style="width: 17rem;">
+    <div class="todo-widget mt-auto pt-4 position-fixed bottom-0 mb-3 ms-3" style="width: 17rem;">
       <div class="small text-uppercase text-white-50 mb-2">À faire</div>
 
       <form class="d-flex gap-2 mb-2" (ngSubmit)="addTodo()">
