@@ -1,5 +1,9 @@
 const { Pool } = require('pg');
 
+require('dotenv').config()
+
+console.log('___', process.env.DATABASE_URL)
+
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL manquant : configurez-le dans backend/.env');
 }
