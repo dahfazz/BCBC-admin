@@ -12,7 +12,7 @@
   <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
     <input type="search" class="form-control w-50" placeholder="🔎 Rechercher" [value]="searchTerm()"
       (input)="searchTerm.set($any($event.target).value)">
-    <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreateModal()">+ Ajouter un
+    <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreatePanel()">+ Ajouter un
       adhérent</button>
   </div>
 
@@ -56,10 +56,11 @@
               <span class="ms-2 my-2 avatar badge rounded-pill">{{ getMemberLetters(member) }}</span>
             </td>
             <td class="text-truncate">
-              <div class="d-flex align-items-center">
-                {{ member.prenom }} {{ member.nom }} <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe
-                  }}</span>
-              </div>
+              <button type="button" class="btn btn-link p-0 text-reset text-decoration-none member-name-btn d-flex align-items-center"
+                (click)="openMemberPanel(member)">
+                <span>{{ member.prenom }} {{ member.nom }}</span>
+                <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe }}</span>
+              </button>
             </td>
             <td class="text-truncate">
               @if (!member.dateNaissance) {
@@ -82,7 +83,7 @@
             </td>
             <td class="text-end text-nowrap">
               <button type="button" class="btn btn-outline-secondary btn-icon-square" title="Modifier"
-                aria-label="Modifier" (click)="openEditModal(member)">
+                aria-label="Modifier" (click)="openMemberPanel(member)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                   <path
                     d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
@@ -101,102 +102,97 @@
   </div>
 </div>
 
-<!-- ── Add/Edit member modal ────────────────────────────────────────── -->
-@if (modalOpen()) {
-<div class="modal-backdrop-custom" (click)="closeModal()"></div>
-<div class="modal d-block" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" (click)="$event.stopPropagation()">
-    <div class="modal-content">
-      <form [formGroup]="form" (ngSubmit)="saveMember()" novalidate>
-        <div class="modal-header">
-          <h5 class="modal-title">{{ editingId() ? 'Modifier l’adhérent' : 'Ajouter un adhérent' }}</h5>
-          <button type="button" class="btn-close" aria-label="Fermer" (click)="closeModal()"></button>
+<!-- ── Member detail/edit panel ─────────────────────────────────────── -->
+@if (panelOpen()) {
+<div class="member-panel" role="dialog" aria-modal="true" aria-label="Détail de l’adhérent">
+  <form [formGroup]="form" (ngSubmit)="saveMember()" novalidate class="d-flex flex-column h-100">
+    <div class="member-panel-header d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+      <h5 class="mb-0">{{ editingId() ? 'Modifier l’adhérent' : 'Ajouter un adhérent' }}</h5>
+      <button type="button" class="btn-close" aria-label="Fermer" (click)="closePanel()"></button>
+    </div>
+
+    <div class="member-panel-body flex-grow-1 overflow-auto px-4 py-3">
+      @if (formError()) {
+      <div class="alert alert-warning">{{ formError() }}</div>
+      }
+      <div class="row g-5">
+        <div class="col-md-6">
+          <label class="form-label">Nom <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="nom" [class.is-invalid]="isInvalid('nom')">
+          <div class="invalid-feedback">Champ obligatoire</div>
         </div>
-        <div class="modal-body">
-          @if (formError()) {
-          <div class="alert alert-warning">{{ formError() }}</div>
-          }
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Nom <span class="text-danger">*</span></label>
-              <input class="form-control" formControlName="nom" [class.is-invalid]="isInvalid('nom')">
-              <div class="invalid-feedback">Champ obligatoire</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Prénom <span class="text-danger">*</span></label>
-              <input class="form-control" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
-              <div class="invalid-feedback">Champ obligatoire</div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Sexe <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="sexe" [class.is-invalid]="isInvalid('sexe')">
-                <option value="">Sélectionnez</option>
-                <option value="F">Féminin</option>
-                <option value="M">Masculin</option>
-              </select>
-              <div class="invalid-feedback">Champ obligatoire</div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Date de naissance <span class="text-danger">*</span></label>
-              <input type="date" class="form-control" formControlName="dateNaissance"
-                [class.is-invalid]="isInvalid('dateNaissance')">
-              <div class="invalid-feedback">Champ obligatoire</div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Catégorie <span class="text-danger">*</span></label>
-              <select class="form-select" formControlName="categorie" [class.is-invalid]="isInvalid('categorie')">
-                <option value="">Sélectionnez</option>
-                @for (cat of categories; track cat) {
-                <option [value]="cat">{{ cat }}</option>
-                }
-              </select>
-              <div class="invalid-feedback">Champ obligatoire</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" formControlName="email" [class.is-invalid]="isInvalid('email')">
-              <div class="invalid-feedback">Email invalide</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Téléphone</label>
-              <input class="form-control" formControlName="telephone">
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Cotisation payée (€) <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" formControlName="cotisationPayee" min="0" step="0.01"
-                [class.is-invalid]="isInvalid('cotisationPayee')">
-              <div class="invalid-feedback">Valeur invalide</div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Cotisation due (€) <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" formControlName="cotisationDue" min="0" step="0.01"
-                [class.is-invalid]="isInvalid('cotisationDue')">
-              <div class="invalid-feedback">Valeur invalide</div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">N° licence FFBB</label>
-              <input class="form-control" formControlName="numeroLicenceFFBB">
-            </div>
+        <div class="col-md-6">
+          <label class="form-label">Prénom <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label d-block">Sexe <span class="text-danger">*</span></label>
+          <div class="btn-group sexe-switch" role="group" aria-label="Sexe">
+            <input type="radio" class="btn-check" formControlName="sexe" value="F" id="sexe-f" autocomplete="off">
+            <label class="btn btn-outline-primary" for="sexe-f">F</label>
+            <input type="radio" class="btn-check" formControlName="sexe" value="M" id="sexe-m" autocomplete="off">
+            <label class="btn btn-outline-primary" for="sexe-m">M</label>
           </div>
         </div>
-        <div class="modal-footer">
-          @if (editingMember(); as m) {
-          <button type="button" class="btn btn-outline-danger me-auto" (click)="confirmDelete(m)">Supprimer</button>
-          <button type="button" class="btn btn-outline-primary" (click)="generateInvoice(m)">Générer la facture</button>
-          }
-          <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Annuler</button>
-          <button type="submit" class="btn btn-primary" [disabled]="saving()">
-            @if (saving()) {
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            Enregistrement…
-            } @else {
-            Enregistrer
-            }
-          </button>
+        <div class="col-md-6">
+          <label class="form-label">Date de naissance</label>
+          <input type="date" class="form-control" formControlName="dateNaissance"
+            [class.is-invalid]="isInvalid('dateNaissance')">
         </div>
-      </form>
+        <div class="col-md-6">
+          <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="categorie" [class.is-invalid]="isInvalid('categorie')">
+            <option value="">Sélectionnez</option>
+            @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" formControlName="email" [class.is-invalid]="isInvalid('email')">
+          <div class="invalid-feedback">Email invalide</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Téléphone</label>
+          <input class="form-control" formControlName="telephone">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Cotisation payée (€) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" formControlName="cotisationPayee" min="0" step="0.01"
+            [class.is-invalid]="isInvalid('cotisationPayee')">
+          <div class="invalid-feedback">Valeur invalide</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Cotisation due (€) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" formControlName="cotisationDue" min="0" step="0.01"
+            [class.is-invalid]="isInvalid('cotisationDue')">
+          <div class="invalid-feedback">Valeur invalide</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">N° licence FFBB</label>
+          <input class="form-control" formControlName="numeroLicenceFFBB">
+        </div>
+      </div>
     </div>
-  </div>
+
+    <div class="member-panel-footer d-flex align-items-center gap-2 px-4 py-3 border-top">
+      @if (editingMember(); as m) {
+      <button type="button" class="btn btn-outline-danger me-auto" (click)="confirmDelete(m)">Supprimer</button>
+      <button type="button" class="btn btn-outline-primary" (click)="generateInvoice(m)">Générer la facture</button>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Enregistrement…
+        } @else {
+        Enregistrer
+        }
+      </button>
+    </div>
+  </form>
 </div>
 }
 

@@ -74,7 +74,7 @@ export class MembersListComponent implements OnInit {
     return labels.map((label) => ({ label, count: counts.get(label)! }));
   });
 
-  modalOpen = signal(false);
+  panelOpen = signal(false);
   editingId = signal<string | null>(null);
   editingMember = signal<Member | null>(null);
   saving = signal(false);
@@ -87,7 +87,7 @@ export class MembersListComponent implements OnInit {
     nom: ['', Validators.required],
     prenom: ['', Validators.required],
     sexe: ['', Validators.required],
-    dateNaissance: ['', Validators.required],
+    dateNaissance: [''],
     categorie: ['', Validators.required],
     email: ['', Validators.email],
     telephone: [''],
@@ -132,15 +132,15 @@ export class MembersListComponent implements OnInit {
     return !!(c?.invalid && c.touched);
   }
 
-  openCreateModal(): void {
+  openCreatePanel(): void {
     this.editingId.set(null);
     this.editingMember.set(null);
     this.formError.set('');
     this.form.reset(emptyMember());
-    this.modalOpen.set(true);
+    this.panelOpen.set(true);
   }
 
-  openEditModal(member: Member): void {
+  openMemberPanel(member: Member): void {
     this.editingId.set(member.id);
     this.editingMember.set(member);
     this.formError.set('');
@@ -156,11 +156,11 @@ export class MembersListComponent implements OnInit {
       cotisationDue: member.cotisationDue,
       numeroLicenceFFBB: member.numeroLicenceFFBB,
     });
-    this.modalOpen.set(true);
+    this.panelOpen.set(true);
   }
 
-  closeModal(): void {
-    this.modalOpen.set(false);
+  closePanel(): void {
+    this.panelOpen.set(false);
   }
 
   saveMember(): void {
@@ -192,7 +192,7 @@ export class MembersListComponent implements OnInit {
     req.subscribe({
       next: () => {
         this.saving.set(false);
-        this.modalOpen.set(false);
+        this.panelOpen.set(false);
         this.loadMembers();
       },
       error: (err) => {
@@ -203,7 +203,7 @@ export class MembersListComponent implements OnInit {
   }
 
   confirmDelete(member: Member): void {
-    this.modalOpen.set(false);
+    this.panelOpen.set(false);
     this.deleteTarget.set(member);
   }
 
