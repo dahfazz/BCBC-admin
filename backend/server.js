@@ -5,7 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const cors = require('cors')
 
 const app = express();
 app.use(cors())
@@ -23,7 +22,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-app.use(cors({ origin: ['http://localhost:4200', 'http://localhost:4201'] }));
 app.use(express.json({ limit: '20mb' }));
 
 if (!fs.existsSync(INVOICES_DIR)) {
