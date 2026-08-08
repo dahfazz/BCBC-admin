@@ -5,13 +5,12 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { pool, initDb } = require('./db');
 
 const app = express();
 app.use(cors())
 const PORT = 3000;
 const INVOICES_DIR = path.resolve(__dirname, '..', 'generated-invoices');
-const DATA_DIR = path.resolve(__dirname, 'data');
-const MEMBERS_FILE = path.join(DATA_DIR, 'members.json');
 
 const EMAIL_FROM = 'bcbc92270@gmail.com';
 const transporter = nodemailer.createTransport({
@@ -28,23 +27,20 @@ if (!fs.existsSync(INVOICES_DIR)) {
   fs.mkdirSync(INVOICES_DIR, { recursive: true });
 }
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(MEMBERS_FILE)) {
-  fs.writeFileSync(MEMBERS_FILE, '[]', 'utf8');
-}
-
-function readMembers() {
-  try {
-    return JSON.parse(fs.readFileSync(MEMBERS_FILE, 'utf8'));
-  } catch {
-    return [];
-  }
-}
-
-function writeMembers(members) {
-  fs.writeFileSync(MEMBERS_FILE, JSON.stringify(members, null, 2), 'utf8');
+function rowToMember(row) {
+  return {
+    id: row.id,
+    nom: row.nom,
+    prenom: row.prenom,
+    sexe: row.sexe,
+    dateNaissance: row.date_naissance,
+    categorie: row.categorie,
+    email: row.email,
+    telephone: row.telephone,
+    cotisationPayee: Number(row.cotisation_payee),
+    cotisationDue: Number(row.cotisation_due),
+    numeroLicenceFFBB: row.numero_licence_ffbb,
+  };
 }
 
 const MEMBER_FIELDS = [
@@ -63,11 +59,17 @@ function sanitizeMemberInput(body) {
   return out;
 }
 
-app.get('/api/members', (_req, res) => {
-  res.json({ members: readMembers() });
+app.get('/api/members', async (_req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM members ORDER BY nom, prenom');
+    res.json({ members: rows.map(rowToMember) });
+  } catch (err) {
+    console.error('Error listing members:', err);
+    res.status(500).json({ error: 'Impossible de récupérer les adhérents' });
+  }
 });
 
-app.post('/api/members', (req, res) => {
+app.post('/api/members', async (req, res) => {
   const data = sanitizeMemberInput(req.body);
   if (!data.nom || !data.prenom) {
     return res.status(400).json({ error: 'Nom et prénom sont obligatoires' });
@@ -78,33 +80,56 @@ app.post('/api/members', (req, res) => {
     cotisationPayee: 0, cotisationDue: 0, numeroLicenceFFBB: '',
     ...data,
   };
-  const members = readMembers();
-  members.push(member);
-  writeMembers(members);
-  res.status(201).json({ member });
+  try {
+    await pool.query(
+      `INSERT INTO members
+        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, numero_licence_ffbb)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [member.id, member.nom, member.prenom, member.sexe, member.dateNaissance, member.categorie,
+        member.email, member.telephone, member.cotisationPayee, member.cotisationDue, member.numeroLicenceFFBB],
+    );
+    res.status(201).json({ member });
+  } catch (err) {
+    console.error('Error creating member:', err);
+    res.status(500).json({ error: "Impossible de créer l'adhérent" });
+  }
 });
 
-app.put('/api/members/:id', (req, res) => {
-  const members = readMembers();
-  const idx = members.findIndex(m => m.id === req.params.id);
-  if (idx === -1) {
-    return res.status(404).json({ error: 'Adhérent introuvable' });
-  }
+app.put('/api/members/:id', async (req, res) => {
   const data = sanitizeMemberInput(req.body);
-  members[idx] = { ...members[idx], ...data };
-  writeMembers(members);
-  res.json({ member: members[idx] });
+  try {
+    const { rows: existingRows } = await pool.query('SELECT * FROM members WHERE id = $1', [req.params.id]);
+    if (existingRows.length === 0) {
+      return res.status(404).json({ error: 'Adhérent introuvable' });
+    }
+    const updated = { ...rowToMember(existingRows[0]), ...data };
+    const { rows } = await pool.query(
+      `UPDATE members SET
+        nom = $2, prenom = $3, sexe = $4, date_naissance = $5, categorie = $6,
+        email = $7, telephone = $8, cotisation_payee = $9, cotisation_due = $10, numero_licence_ffbb = $11
+       WHERE id = $1
+       RETURNING *`,
+      [req.params.id, updated.nom, updated.prenom, updated.sexe, updated.dateNaissance, updated.categorie,
+        updated.email, updated.telephone, updated.cotisationPayee, updated.cotisationDue, updated.numeroLicenceFFBB],
+    );
+    res.json({ member: rowToMember(rows[0]) });
+  } catch (err) {
+    console.error('Error updating member:', err);
+    res.status(500).json({ error: "Impossible de mettre à jour l'adhérent" });
+  }
 });
 
-app.delete('/api/members/:id', (req, res) => {
-  const members = readMembers();
-  const idx = members.findIndex(m => m.id === req.params.id);
-  if (idx === -1) {
-    return res.status(404).json({ error: 'Adhérent introuvable' });
+app.delete('/api/members/:id', async (req, res) => {
+  try {
+    const { rows } = await pool.query('DELETE FROM members WHERE id = $1 RETURNING *', [req.params.id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Adhérent introuvable' });
+    }
+    res.json({ success: true, member: rowToMember(rows[0]) });
+  } catch (err) {
+    console.error('Error deleting member:', err);
+    res.status(500).json({ error: "Impossible de supprimer l'adhérent" });
   }
-  const [removed] = members.splice(idx, 1);
-  writeMembers(members);
-  res.json({ success: true, member: removed });
 });
 
 app.post('/api/save-invoice', (req, res) => {
@@ -171,7 +196,14 @@ app.get('/api/invoices', (_req, res) => {
 
 app.use('/invoices', express.static(INVOICES_DIR));
 
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
-  console.log(`Invoices folder: ${INVOICES_DIR}`);
-});
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Backend running on http://localhost:${PORT}`);
+      console.log(`Invoices folder: ${INVOICES_DIR}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to initialize database:', err);
+    process.exit(1);
+  });
