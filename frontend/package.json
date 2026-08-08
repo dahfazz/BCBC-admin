@@ -20,6 +20,7 @@
     "@angular/router": "^22.0.0",
     "@types/jspdf": "^2.0.0",
     "bootstrap": "^5.3.8",
+    "firebase": "^12.17.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "rxjs": "~7.8.0",

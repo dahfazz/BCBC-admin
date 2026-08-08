@@ -65,13 +65,3 @@
   height: 2.25rem;
   padding: 0 !important;
 }
-
-.avatar {
-  height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  color: var(--bs-primary);
-  background-color: rgba(var(--bs-primary-rgb), .1);
-}

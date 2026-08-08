@@ -6,6 +6,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { pool, initDb } = require('./db');
+const { requireAuth } = require('./auth');
 
 const app = express();
 app.use(cors())
@@ -22,6 +23,8 @@ const transporter = nodemailer.createTransport({
 });
 
 app.use(express.json({ limit: '20mb' }));
+app.use('/api', requireAuth);
+app.use('/invoices', requireAuth);
 
 if (!fs.existsSync(INVOICES_DIR)) {
   fs.mkdirSync(INVOICES_DIR, { recursive: true });
@@ -129,6 +132,76 @@ app.delete('/api/members/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting member:', err);
     res.status(500).json({ error: "Impossible de supprimer l'adhérent" });
+  }
+});
+
+function rowToPlanningEvent(row) {
+  return {
+    id: row.id,
+    date: row.date,
+    dayLabel: row.day_label,
+    category: row.category,
+    label: row.label,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    coach: row.coach,
+    type: row.type,
+    opponent: row.opponent,
+    scoreFor: row.score_for === null ? null : Number(row.score_for),
+    scoreAgainst: row.score_against === null ? null : Number(row.score_against),
+    cancelled: row.cancelled,
+  };
+}
+
+app.get('/api/planning-events', async (_req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM planning_events');
+    res.json({ events: rows.map(rowToPlanningEvent) });
+  } catch (err) {
+    console.error('Error listing planning events:', err);
+    res.status(500).json({ error: 'Impossible de récupérer les événements du planning' });
+  }
+});
+
+app.put('/api/planning-events/:id', async (req, res) => {
+  const b = req.body || {};
+  if (!b.date) {
+    return res.status(400).json({ error: 'La date est obligatoire' });
+  }
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO planning_events
+        (id, date, day_label, category, label, start_time, end_time, coach, type, opponent, score_for, score_against, cancelled)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       ON CONFLICT (id) DO UPDATE SET
+         date = $2, day_label = $3, category = $4, label = $5, start_time = $6, end_time = $7,
+         coach = $8, type = $9, opponent = $10, score_for = $11, score_against = $12, cancelled = $13
+       RETURNING *`,
+      [
+        req.params.id, b.date, b.dayLabel || '', b.category || '', b.label || '',
+        b.startTime || '', b.endTime || '', b.coach || '', b.type || 'entrainement', b.opponent || '',
+        b.scoreFor === undefined || b.scoreFor === null || b.scoreFor === '' ? null : Number(b.scoreFor),
+        b.scoreAgainst === undefined || b.scoreAgainst === null || b.scoreAgainst === '' ? null : Number(b.scoreAgainst),
+        !!b.cancelled,
+      ],
+    );
+    res.json({ event: rowToPlanningEvent(rows[0]) });
+  } catch (err) {
+    console.error('Error saving planning event:', err);
+    res.status(500).json({ error: "Impossible d'enregistrer l'événement" });
+  }
+});
+
+app.delete('/api/planning-events/:id', async (req, res) => {
+  try {
+    const { rows } = await pool.query('DELETE FROM planning_events WHERE id = $1 RETURNING *', [req.params.id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Événement introuvable' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting planning event:', err);
+    res.status(500).json({ error: "Impossible de supprimer l'événement" });
   }
 });
 

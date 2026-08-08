@@ -12,8 +12,11 @@ export interface PlanningSlot {
 }
 
 export interface PlanningSession extends PlanningSlot {
+  id: string;
   date: Date;
   opponent?: string;
+  scoreFor?: number | null;
+  scoreAgainst?: number | null;
 }
 
 export interface PlanningWeek {
@@ -143,6 +146,23 @@ function mulberry32(seed: number): () => number {
   };
 }
 
+// Formate une date en 'YYYY-MM-DD' à partir des composantes locales, sans passer par
+// toISOString() (qui convertit en UTC et peut faire glisser la date d'un jour en France).
+export function toISODate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export function buildTemplateId(date: Date, category: string): string {
+  return `tmpl:${toISODate(date)}:${category}`;
+}
+
+export function isTemplateId(id: string): boolean {
+  return id.startsWith('tmpl:');
+}
+
 function mondayOf(date: Date): Date {
   const d = new Date(date);
   const dow = d.getDay() || 7; // dimanche -> 7
@@ -166,7 +186,7 @@ export function buildSeasonPlanning(seasonStart: Date, seasonEnd: Date): Plannin
       const date = new Date(cursor);
       date.setDate(date.getDate() + (slot.day - 1));
       if (date >= seasonStart && date <= seasonEnd) {
-        sessions.push({ ...slot, date });
+        sessions.push({ ...slot, date, id: buildTemplateId(date, slot.category) });
       }
     }
 
@@ -178,18 +198,139 @@ export function buildSeasonPlanning(seasonStart: Date, seasonEnd: Date): Plannin
         opponent = NBA_TEAMS[Math.floor(rand() * NBA_TEAMS.length)];
       }
       previousOpponent = opponent;
-      sessions.push({ ...MATCH_SLOT, date: matchDate, opponent });
+      sessions.push({
+        ...MATCH_SLOT,
+        date: matchDate,
+        opponent,
+        id: buildTemplateId(matchDate, MATCH_SLOT.category),
+      });
     }
 
     sessions.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    if (sessions.length > 0) {
-      weeks.push({ weekStart: cursor, weekEnd, sessions });
-    }
+    weeks.push({ weekStart: cursor, weekEnd, sessions });
 
     cursor = new Date(cursor);
     cursor.setDate(cursor.getDate() + 7);
   }
 
   return weeks;
+}
+
+// Représentation stockée côté backend : soit la surcharge/annulation d'une séance générée
+// par le modèle (id commençant par 'tmpl:'), soit un événement ponctuel ajouté manuellement.
+export interface PlanningEventOverride {
+  id: string;
+  date: string; // 'YYYY-MM-DD'
+  dayLabel: string;
+  category: string;
+  label: string;
+  startTime: string;
+  endTime: string;
+  coach: string;
+  type: SessionType;
+  opponent: string;
+  scoreFor: number | null;
+  scoreAgainst: number | null;
+  cancelled: boolean;
+}
+
+export type PlanningEventPayload = Omit<PlanningEventOverride, 'id'>;
+
+export function overrideToPayload(session: PlanningSession, cancelled: boolean): PlanningEventPayload {
+  return {
+    date: toISODate(session.date),
+    dayLabel: session.dayLabel,
+    category: session.category,
+    label: session.label,
+    startTime: session.startTime,
+    endTime: session.endTime,
+    coach: session.coach,
+    type: session.type,
+    opponent: session.opponent ?? '',
+    scoreFor: session.scoreFor ?? null,
+    scoreAgainst: session.scoreAgainst ?? null,
+    cancelled,
+  };
+}
+
+function overrideToSession(override: PlanningEventOverride, date: Date): PlanningSession {
+  const dow = date.getDay() || 7;
+  return {
+    id: override.id,
+    day: dow,
+    dayLabel: override.dayLabel,
+    category: override.category,
+    label: override.label,
+    startTime: override.startTime,
+    endTime: override.endTime,
+    coach: override.coach,
+    type: override.type,
+    date,
+    opponent: override.opponent || undefined,
+    scoreFor: override.scoreFor,
+    scoreAgainst: override.scoreAgainst,
+  };
+}
+
+function applyOverride(session: PlanningSession, override: PlanningEventOverride): PlanningSession {
+  return {
+    ...session,
+    dayLabel: override.dayLabel || session.dayLabel,
+    category: override.category,
+    label: override.label,
+    startTime: override.startTime,
+    endTime: override.endTime,
+    coach: override.coach,
+    type: override.type,
+    opponent: override.opponent || undefined,
+    scoreFor: override.scoreFor,
+    scoreAgainst: override.scoreAgainst,
+  };
+}
+
+// Fusionne le calendrier généré par le modèle hebdomadaire avec les surcharges/événements
+// ponctuels stockés côté backend : une surcharge annulée masque la séance, une surcharge
+// non annulée remplace ses champs, et un événement sans correspondance dans le modèle
+// (id ne commençant pas par 'tmpl:') est ajouté à la date concernée.
+export function mergeOverrides(weeks: PlanningWeek[], overrides: PlanningEventOverride[]): PlanningWeek[] {
+  const templateOverrides = new Map(overrides.filter((o) => isTemplateId(o.id)).map((o) => [o.id, o]));
+  const customByDate = new Map<string, PlanningEventOverride[]>();
+  for (const o of overrides) {
+    if (!isTemplateId(o.id) && !o.cancelled) {
+      const list = customByDate.get(o.date) ?? [];
+      list.push(o);
+      customByDate.set(o.date, list);
+    }
+  }
+
+  return weeks.map((week) => {
+    const sessions: PlanningSession[] = [];
+
+    for (const session of week.sessions) {
+      const override = templateOverrides.get(session.id);
+      if (override) {
+        if (!override.cancelled) {
+          sessions.push(applyOverride(session, override));
+        }
+      } else {
+        sessions.push(session);
+      }
+    }
+
+    let cursor = new Date(week.weekStart);
+    for (let i = 0; i < 7; i++) {
+      const customs = customByDate.get(toISODate(cursor));
+      if (customs) {
+        for (const custom of customs) {
+          sessions.push(overrideToSession(custom, new Date(cursor)));
+        }
+      }
+      cursor = new Date(cursor);
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    sessions.sort((a, b) => a.date.getTime() - b.date.getTime());
+    return { ...week, sessions };
+  });
 }

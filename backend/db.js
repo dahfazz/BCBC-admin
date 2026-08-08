@@ -2,8 +2,6 @@ const { Pool } = require('pg');
 
 require('dotenv').config()
 
-console.log('___', process.env.DATABASE_URL)
-
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL manquant : configurez-le dans backend/.env');
 }
@@ -27,6 +25,24 @@ async function initDb() {
       cotisation_payee NUMERIC NOT NULL DEFAULT 0,
       cotisation_due NUMERIC NOT NULL DEFAULT 0,
       numero_licence_ffbb TEXT NOT NULL DEFAULT ''
+    );
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS planning_events (
+      id TEXT PRIMARY KEY,
+      date TEXT NOT NULL,
+      day_label TEXT NOT NULL DEFAULT '',
+      category TEXT NOT NULL DEFAULT '',
+      label TEXT NOT NULL DEFAULT '',
+      start_time TEXT NOT NULL DEFAULT '',
+      end_time TEXT NOT NULL DEFAULT '',
+      coach TEXT NOT NULL DEFAULT '',
+      type TEXT NOT NULL DEFAULT 'entrainement',
+      opponent TEXT NOT NULL DEFAULT '',
+      score_for INTEGER,
+      score_against INTEGER,
+      cancelled BOOLEAN NOT NULL DEFAULT false
     );
   `);
 }

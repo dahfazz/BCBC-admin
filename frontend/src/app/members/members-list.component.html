@@ -9,8 +9,8 @@
   <h1 class="mb-5">Adhérents</h1>
 
   <!-- ── Recherche ──────────────────────────────────────────────────── -->
-  <div class="d-flex justify-content-between align-items-start gap-3 mb-1">
-    <input type="search" class="form-control w-50" placeholder="🔎 Rechercher" [value]="searchTerm()"
+  <div class="d-flex justify-content-between align-items-start gap-3">
+    <input type="search" class="form-control w-50 border-black" placeholder="🔎 Rechercher" [value]="searchTerm()"
       (input)="searchTerm.set($any($event.target).value)">
     <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreatePanel()">+ Ajouter un
       adhérent</button>
@@ -18,16 +18,16 @@
 
   <ul class="nav mb-4">
     <li class="nav-item">
-      <button type="button" class="px-0 me-3 nav-link text-decoration-underline"
+      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
         (click)="customFilter(MISSING_DATES)">Dates de
         naissance manquantes</button>
     </li>
     <li class="nav-item">
-      <button type="button" class="px-0 me-3 nav-link text-decoration-underline"
+      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
         (click)="customFilter(MISSING_PAYMENTS)">Cotisations incomplètes</button>
     </li>
     <li class="nav-item">
-      <button type="button" class="px-0 me-3 nav-link text-decoration-underline"
+      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
         (click)="customFilter(FEMALES)">Féminines</button>
     </li>
   </ul>
@@ -42,18 +42,18 @@
           <col style="width: 20%"> <!-- Date -->
           <col style="width: 6%"> <!-- Cat. -->
           <col style="width: 26%"> <!-- Email -->
-          <col style="width: 11%"> <!-- Dû -->
-          <col style="width: 10%"> <!-- Actions -->
+          <col style="width: 10%"> <!-- Dû -->
+          <col style="width: 15%"> <!-- Actions -->
         </colgroup>
         <thead class="table-light">
           <tr>
             <th class="text-center">#</th>
-            <th>Noms</th>
+            <th>Nom</th>
             <th>Date</th>
             <th class="text-center">Cat.</th>
             <th>Email</th>
-            <th class="text-end">Dû</th>
-            <th class="text-end"></th>
+            <th>Dû</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -79,10 +79,10 @@
                 <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe }}</span>
               </button>
             </td>
-            <td class="text-truncate">
+            <td class="text-truncate" [ngClass]="{'text-center': !member.dateNaissance}">
               @if (!member.dateNaissance) {
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
-                class="text-warning me-1" viewBox="0 0 16 16" title="Date de naissance inconnue">
+                class="text-danger me-1" viewBox="0 0 16 16" title="Date de naissance inconnue">
                 <path
                   d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
               </svg>
@@ -100,7 +100,7 @@
               } @else {-}
             </td>
             <td class="text-end text-nowrap">
-              <button type="button" class="btn btn-outline-secondary btn-icon-square" title="Modifier"
+              <button type="button" class="ms-4 btn btn-outline-secondary btn-icon-square" title="Modifier"
                 aria-label="Modifier" (click)="openMemberPanel(member)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                   <path

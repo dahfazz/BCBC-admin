@@ -2,8 +2,20 @@
   <div class="vh-100 pb-4 position-relative">
 
     <div class="position-fixed" style="width: 300px;">
-      <a style="text-decoration: none; background: #00000020;" class="p-4 mb-4 d-block w-100 h1 text-white"
+      <a style="text-decoration: none; background: #00000030;" class="p-4 mb-0 d-block w-100 h2 text-white"
         routerLink="/">Boisco Basket</a>
+
+      <div style="background: #00000030;" class="user-menu position-relative w-100 px-4 pb-3 mb-4">
+        @if (user(); as u) {
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="avatar badge rounded-pill bg-white h-75">{{ u.displayName?.charAt(0) }}</span>
+          <div class="text-white text-truncate ms-2">{{ u.displayName }}</div>
+        </div>
+        <div class="user-tooltip">
+          <button type="button" class="btn btn-sm btn-outline-light w-100" (click)="signOut()">Se déconnecter</button>
+        </div>
+        }
+      </div>
 
       <nav class="nav flex-column gap-2 mx-4">
         <a class="ps-1 text-white nav-link" routerLink="/adherents" routerLinkActive="active">Adhérents</a>
@@ -13,6 +25,7 @@
         <a class="ps-1 text-white nav-link" href="https://extranet.ffbb.com/fbi/connexion.fbi" target="_blank"
           rel="noopener noreferrer">FBI</a>
       </nav>
+
 
     </div>
 

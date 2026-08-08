@@ -4,46 +4,185 @@
   <h1 class="mb-1">Planning</h1>
   <div class="text-muted mb-4">{{ seasonLabel }}</div>
 
+  @if (loadError()) {
+  <div class="alert alert-warning">{{ loadError() }}</div>
+  }
+
   <div class="planning-weeks d-flex flex-column gap-3">
-    @for (week of weeks; track week.weekStart.getTime()) {
-      <div class="card shadow-sm">
-        <div class="card-header bg-white fw-semibold">
-          {{ formatWeekRange(week) }}
-        </div>
-        <ul class="list-group list-group-flush">
-          @for (session of week.sessions; track session.date.getTime() + session.category) {
-            @let vacation = vacationLabel(session);
-            <li class="list-group-item d-flex align-items-center gap-3" [class.session-vacation]="vacation">
-              <span class="badge rounded-pill text-bg-light day-badge">
-                {{ session.dayLabel }} <span class="fw-normal">{{ formatSessionDate(session) }}</span>
-              </span>
-              <span class="text-nowrap time-range ml-2">{{ session.startTime }} – {{ session.endTime }}</span>
-              <span class="badge rounded-pill" [ngClass]="session.type === 'match' ? 'text-bg-danger' : 'text-bg-primary'">
-                {{ session.type === 'match' ? 'Match' : 'Séance' }} | {{ session.label }}
-              </span>
-              @if (session.type === 'match') {
-                <span>Match contre <strong>{{ session.opponent }}</strong></span>
-              } @else if (session.coach) {
-                <span class="text-muted">Entraîneur : {{ session.coach }}</span>
-              }
-              @if (vacation) {
-                <span class="badge text-bg-light ms-auto">{{ vacation }}</span>
-              }
-            </li>
-          }
-        </ul>
-        <div class="card-footer bg-white">
-          <label class="form-label small text-muted mb-1" [for]="'note-' + weekKey(week)">
-            Note...
-          </label>
-          <input
-            [id]="'note-' + weekKey(week)"
-            type="text"
-            class="form-control form-control-sm"
-            [ngModel]="notes()[weekKey(week)] ?? ''"
-            (ngModelChange)="updateNote(week, $event)">
-        </div>
+    @for (week of weeks(); track week.weekStart.getTime()) {
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold d-flex align-items-center justify-content-between">
+        <span>{{ formatWeekRange(week) }}</span>
+        <button type="button" class="btn btn-sm btn-primary" (click)="openAddEvent(week)">+ Ajouter un
+          événement</button>
       </div>
+
+      <div class="week-grid d-flex">
+        <div class="hour-axis">
+          @for (h of hours; track h) {
+          <div class="hour-mark" [style.top.px]="hourOffset(h)">{{ h }}h</div>
+          }
+        </div>
+
+        @for (day of weekDays(week); track day.dayIndex) {
+        <div class="day-col">
+          <div class="day-header text-center">
+            <div class="fw-semibold small">{{ day.dayLabel }}</div>
+            <div class="text-muted small">{{ formatDayDate(day.date) }}</div>
+          </div>
+          <div class="day-timeline position-relative" [style.height.px]="timelineHeight">
+            @for (h of hours; track h) {
+            <div class="hour-line" [style.top.px]="hourOffset(h)"></div>
+            }
+            @for (session of day.sessions; track session.id) {
+            <button type="button" class="event-block"
+              [ngStyle]="eventStyle(session)"
+              [ngClass]="session.type === 'match' ? 'event-match' : 'event-training'"
+              (click)="openEditEvent(session)">
+              <div class="event-time">{{ session.startTime }}–{{ session.endTime }}</div>
+              <div class="event-label text-truncate">{{ session.label }}</div>
+              @if (session.type === 'match') {
+              <div class="event-opponent text-truncate">vs {{ session.opponent }}</div>
+              @if (session.scoreFor !== null && session.scoreFor !== undefined && session.scoreAgainst !== null && session.scoreAgainst !== undefined) {
+              <div class="event-score">{{ session.scoreFor }} – {{ session.scoreAgainst }}</div>
+              }
+              } @else if (session.coach) {
+              <div class="event-coach text-truncate">{{ session.coach }}</div>
+              }
+            </button>
+            }
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2"
+            (click)="openAddEvent(week, day.date)">+</button>
+        </div>
+        }
+      </div>
+
+      <div class="card-footer bg-white">
+        <label class="form-label small text-muted mb-1" [for]="'note-' + weekKey(week)">
+          Note...
+        </label>
+        <input [id]="'note-' + weekKey(week)" type="text" class="form-control form-control-sm"
+          [ngModel]="notes()[weekKey(week)] ?? ''" (ngModelChange)="updateNote(week, $event)">
+      </div>
+    </div>
     }
   </div>
 </div>
+
+<!-- ── Add/edit event panel ──────────────────────────────────────────── -->
+@if (panelOpen()) {
+<div class="member-panel" role="dialog" aria-modal="true" aria-label="Détail de l’événement">
+  <form [formGroup]="form" (ngSubmit)="saveEvent()" novalidate class="d-flex flex-column h-100">
+    <div class="member-panel-header d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+      <h5 class="mb-0">{{ editingSession() ? 'Modifier l’événement' : 'Ajouter un événement' }}</h5>
+      <button type="button" class="btn-close" aria-label="Fermer" (click)="closePanel()"></button>
+    </div>
+
+    <div class="member-panel-body flex-grow-1 overflow-auto px-4 py-3">
+      @if (formError()) {
+      <div class="alert alert-warning">{{ formError() }}</div>
+      }
+      <div class="row g-4">
+        <div class="col-md-6">
+          <label class="form-label">Date <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="date" [class.is-invalid]="isInvalid('date')">
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Type <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="type">
+            <option value="entrainement">Entraînement</option>
+            <option value="match">Match</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="category" [class.is-invalid]="isInvalid('category')">
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Libellé <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="label" [class.is-invalid]="isInvalid('label')">
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Heure de début <span class="text-danger">*</span></label>
+          <input type="time" class="form-control" formControlName="startTime"
+            [class.is-invalid]="isInvalid('startTime')">
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Heure de fin <span class="text-danger">*</span></label>
+          <input type="time" class="form-control" formControlName="endTime"
+            [class.is-invalid]="isInvalid('endTime')">
+          <div class="invalid-feedback">Champ obligatoire</div>
+        </div>
+
+        @if (isMatch()) {
+        <div class="col-md-6">
+          <label class="form-label">Adversaire</label>
+          <input class="form-control" formControlName="opponent">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Score BCBC</label>
+          <input type="number" class="form-control" formControlName="scoreFor" min="0">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Score adverse</label>
+          <input type="number" class="form-control" formControlName="scoreAgainst" min="0">
+        </div>
+        } @else {
+        <div class="col-md-6">
+          <label class="form-label">Entraîneur</label>
+          <input class="form-control" formControlName="coach">
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="member-panel-footer d-flex align-items-center gap-2 px-4 py-3 border-top">
+      @if (editingSession(); as s) {
+      <button type="button" class="btn btn-outline-danger me-auto" (click)="confirmDelete(s)">Supprimer</button>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Enregistrement…
+        } @else {
+        Enregistrer
+        }
+      </button>
+    </div>
+  </form>
+</div>
+}
+
+<!-- ── Delete confirmation modal ────────────────────────────────────── -->
+@if (deleteTarget(); as session) {
+<div class="modal-backdrop-custom" (click)="cancelDelete()"></div>
+<div class="modal d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Supprimer l’événement</h5>
+        <button type="button" class="btn-close" aria-label="Fermer" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer <strong>{{ session.label }}</strong> du {{ formatSessionDate(session) }} ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancelDelete()">Annuler</button>
+        <button type="button" class="btn btn-danger" [disabled]="deleting()" (click)="deleteEvent()">
+          @if (deleting()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Suppression…
+          } @else {
+          Supprimer
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
