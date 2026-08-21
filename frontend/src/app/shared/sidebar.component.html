@@ -22,6 +22,17 @@
         <a class="ps-1 text-white nav-link" routerLink="/planning" routerLinkActive="active">Planning</a>
         <a class="ps-1 text-white nav-link" routerLink="/tresorerie" routerLinkActive="active">Trésorerie</a>
         <hr class="border-white border-lg" />
+
+        <div class="category-section">
+          <div class="small text-uppercase text-white-50 mb-2 px-1">Catégories</div>
+          @for (category of categoryLinks; track category) {
+          <a class="ps-1 text-white nav-link small" [routerLink]="['/adherents']" [queryParams]="{ category }"
+            routerLinkActive="active">
+            {{ category }}
+          </a>
+          }
+        </div>
+
         <a class="ps-1 text-white nav-link" href="https://extranet.ffbb.com/fbi/connexion.fbi" target="_blank"
           rel="noopener noreferrer">FBI</a>
       </nav>

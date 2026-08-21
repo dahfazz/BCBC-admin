@@ -30,6 +30,10 @@
       <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
         (click)="customFilter(FEMALES)">Féminines</button>
     </li>
+    <li class="nav-item">
+      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
+        (click)="customFilter(FBI)">FBI manquants</button>
+    </li>
   </ul>
 
   <!-- ── Tableau des adhérents ──────────────────────────────────────── -->
@@ -47,12 +51,162 @@
         </colgroup>
         <thead class="table-light">
           <tr>
-            <th class="text-center">#</th>
-            <th>Nom</th>
-            <th>Date</th>
-            <th class="text-center">Cat.</th>
-            <th>Email</th>
-            <th>Dû</th>
+            <th class="text-center">
+              <button type="button"
+                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
+                (click)="toggleSort('nom')">
+                <span>#</span>
+                @if (getSortIcon('nom') === 'up') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
+                </svg>
+                } @else if (getSortIcon('nom') === 'down') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
+                </svg>
+                }
+              </button>
+            </th>
+            <th>
+              <button type="button"
+                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
+                (click)="toggleSort('nom')">
+                <span>Nom</span>
+                @if (getSortIcon('nom') === 'up') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
+                </svg>
+                } @else if (getSortIcon('nom') === 'down') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
+                </svg>
+                }
+              </button>
+            </th>
+            <th>
+              <button type="button"
+                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
+                (click)="toggleSort('dateNaissance')">
+                <span>Date</span>
+                @if (getSortIcon('dateNaissance') === 'up') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
+                </svg>
+                } @else if (getSortIcon('dateNaissance') === 'down') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
+                </svg>
+                }
+              </button>
+            </th>
+            <th class="text-center">
+              <button type="button"
+                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
+                (click)="toggleSort('categorie')">
+                <span>Cat.</span>
+                @if (getSortIcon('categorie') === 'up') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
+                </svg>
+                } @else if (getSortIcon('categorie') === 'down') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
+                </svg>
+                }
+              </button>
+            </th>
+            <th>
+              <button type="button"
+                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
+                (click)="toggleSort('email')">
+                <span>Email</span>
+                @if (getSortIcon('email') === 'up') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
+                </svg>
+                } @else if (getSortIcon('email') === 'down') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
+                </svg>
+                }
+              </button>
+            </th>
+            <th>
+              <button type="button"
+                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
+                (click)="toggleSort('cotisationDue')">
+                <span>Dû</span>
+                @if (getSortIcon('cotisationDue') === 'up') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
+                </svg>
+                } @else if (getSortIcon('cotisationDue') === 'down') {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
+                </svg>
+                } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
+                  aria-hidden="true">
+                  <path
+                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
+                </svg>
+                }
+              </button>
+            </th>
             <th></th>
           </tr>
         </thead>
@@ -66,7 +220,7 @@
             <td colspan="9" class="text-center text-muted py-4">Aucun adhérent trouvé.</td>
           </tr>
           } @else {
-          @for (member of filteredMembers(); track member.id) {
+          @for (member of sortedMembers(); track member.id) {
           <tr>
             <td class="text-truncate text-center">
               <span class="ms-2 my-2 avatar badge rounded-pill">{{ getMemberLetters(member) }}</span>
@@ -135,13 +289,13 @@
       }
       <div class="row g-5">
         <div class="col-md-6">
-          <label class="form-label">Nom <span class="text-danger">*</span></label>
-          <input class="form-control" formControlName="nom" [class.is-invalid]="isInvalid('nom')">
+          <label class="form-label">Prénom <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
           <div class="invalid-feedback">Champ obligatoire</div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Prénom <span class="text-danger">*</span></label>
-          <input class="form-control" formControlName="prenom" [class.is-invalid]="isInvalid('prenom')">
+          <label class="form-label">Nom <span class="text-danger">*</span></label>
+          <input class="form-control" formControlName="nom" [class.is-invalid]="isInvalid('nom')">
           <div class="invalid-feedback">Champ obligatoire</div>
         </div>
         <div class="col-md-6">
@@ -190,8 +344,11 @@
           <div class="invalid-feedback">Valeur invalide</div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">N° licence FFBB</label>
-          <input class="form-control" formControlName="numeroLicenceFFBB">
+          <label class="form-label d-block">Inscrit / FBI</label>
+          <div class="btn-group" role="group">
+            <input type="checkbox" class="btn-check" formControlName="FBI" id="fbi-check" autocomplete="off">
+            <label class="btn btn-outline-primary" for="fbi-check">{{ form.controls.FBI.value ? '✓' : '✗' }}</label>
+          </div>
         </div>
       </div>
     </div>

@@ -65,3 +65,25 @@
   height: 2.25rem;
   padding: 0 !important;
 }
+
+.table thead button.btn-link {
+  font-weight: 600;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1.2;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.table thead button.btn-link:hover,
+.table thead button.btn-link:focus-visible {
+  color: inherit;
+  text-decoration: none;
+}
+
+.table thead th {
+  vertical-align: middle;
+}

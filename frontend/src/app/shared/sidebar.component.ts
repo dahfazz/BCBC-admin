@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CATEGORIES } from '../members/member.model';
 import { TodoService } from './todo.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -16,9 +17,20 @@ export class SidebarComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
 
+  readonly categoryLinks = [
+    'U7/U9',
+    ...CATEGORIES.filter((category) => category !== 'U7' && category !== 'U9'),
+  ];
+
   user = this.auth.user;
   todos = this.todoService.todos;
   newTodo = '';
+
+  goToCategory(category: string): void {
+    void this.router.navigate(['/adherents'], {
+      queryParams: { category },
+    });
+  }
 
   async signOut(): Promise<void> {
     await this.auth.signOut();

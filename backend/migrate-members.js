@@ -12,11 +12,11 @@ async function main() {
   for (const m of members) {
     await pool.query(
       `INSERT INTO members
-        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, numero_licence_ffbb)
+        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, fbi)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        ON CONFLICT (id) DO NOTHING`,
       [m.id, m.nom, m.prenom, m.sexe || '', m.dateNaissance || '', m.categorie || '',
-        m.email || '', m.telephone || '', Number(m.cotisationPayee) || 0, Number(m.cotisationDue) || 0, m.numeroLicenceFFBB || ''],
+        m.email || '', m.telephone || '', Number(m.cotisationPayee) || 0, Number(m.cotisationDue) || 0, Boolean(m.FBI)],
     );
   }
 

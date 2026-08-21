@@ -1,10 +1,11 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MemberService } from './member.service';
 import { Member, MemberInput, CATEGORIES, emptyMember } from './member.model';
 import { SidebarComponent } from '../shared/sidebar.component';
+import { DEFAULT_COTISATION_DUE } from '../app';
 
 @Component({
   selector: 'app-members-list',
@@ -16,10 +17,12 @@ export class MembersListComponent implements OnInit {
   private fb = inject(FormBuilder);
   private memberService = inject(MemberService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   public MISSING_DATES = 'missing-date';
   public MISSING_PAYMENTS = 'missing-payments';
   public FEMALES = 'feminine-only';
+  public FBI = 'fbi-missing';
 
   readonly categories = CATEGORIES;
 
@@ -27,11 +30,36 @@ export class MembersListComponent implements OnInit {
   loading = signal(false);
   loadError = signal('');
 
+  sortState = signal<{
+    key: 'nom' | 'dateNaissance' | 'categorie' | 'email' | 'cotisationDue';
+    direction: 'asc' | 'desc';
+  }>({
+    key: 'nom',
+    direction: 'asc',
+  });
+
   searchTerm = signal('');
+  private matchesCategoryFilter(member: Member, category: string): boolean {
+    if (category === 'u7/u9') {
+      return member.categorie === 'U7' || member.categorie === 'U9';
+    }
+    return member.categorie === category;
+  }
+
   filteredMembers = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const list = this.members();
     if (!term) return list;
+
+    const exactCategory = this.categories.find((c) => c.toLowerCase() === term);
+    if (exactCategory) {
+      return list.filter((m) => m.categorie === exactCategory);
+    }
+
+    const groupedCategory = 'u7/u9';
+    if (term === groupedCategory) {
+      return list.filter((m) => this.matchesCategoryFilter(m, groupedCategory));
+    }
 
     switch (term) {
       case this.MISSING_DATES:
@@ -40,16 +68,62 @@ export class MembersListComponent implements OnInit {
         return list.filter((m) => m.cotisationDue > 0);
       case this.FEMALES:
         return list.filter((m) => m.sexe === 'F');
+      case this.FBI:
+        return list.filter((m) => !m.FBI && m.categorie !== 'FSGT');
       default:
-        return list
-          .sort((a: Member, b: Member) => a.nom.localeCompare(b.nom))
-          .filter((m) =>
-            `${m.nom} ${m.prenom} ${m.email} ${m.categorie} ${m.numeroLicenceFFBB}`
-              .toLowerCase()
-              .includes(term),
-          );
+        return list.filter((m) =>
+          `${m.nom} ${m.prenom} ${m.email} ${m.categorie}`.toLowerCase().includes(term),
+        );
     }
   });
+
+  sortedMembers = computed(() => {
+    const list = [...this.filteredMembers()];
+    const { key, direction } = this.sortState();
+
+    list.sort((a, b) => {
+      const compare = this.compareMembers(a, b, key);
+      return direction === 'asc' ? compare : -compare;
+    });
+
+    return list;
+  });
+
+  private compareMembers(a: Member, b: Member, key: string): number {
+    switch (key) {
+      case 'dateNaissance': {
+        const dateA = a.dateNaissance
+          ? new Date(a.dateNaissance).getTime()
+          : Number.MAX_SAFE_INTEGER;
+        const dateB = b.dateNaissance
+          ? new Date(b.dateNaissance).getTime()
+          : Number.MAX_SAFE_INTEGER;
+        return dateA - dateB;
+      }
+      case 'categorie':
+        return String(a.categorie || '').localeCompare(String(b.categorie || ''), undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      case 'email':
+        return String(a.email || '').localeCompare(String(b.email || ''), undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      case 'cotisationDue':
+        return Number(a.cotisationDue || 0) - Number(b.cotisationDue || 0);
+      case 'nom':
+        return String(a.nom || '').localeCompare(String(b.nom || ''), undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+      default:
+        return String(a.nom || '').localeCompare(String(b.nom || ''), undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+    }
+  }
 
   summary = computed(() => {
     const list = this.members();
@@ -106,11 +180,15 @@ export class MembersListComponent implements OnInit {
     email: ['', Validators.email],
     telephone: [''],
     cotisationPayee: [0, [Validators.required, Validators.min(0)]],
-    cotisationDue: [0, [Validators.required, Validators.min(0)]],
-    numeroLicenceFFBB: [''],
+    cotisationDue: [DEFAULT_COTISATION_DUE, [Validators.required, Validators.min(0)]],
+    FBI: [false],
   });
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const category = params.get('category') ?? '';
+      this.searchTerm.set(category);
+    });
     this.loadMembers();
   }
 
@@ -132,11 +210,31 @@ export class MembersListComponent implements OnInit {
   }
 
   filterByCat(categorie: string): void {
-    this.searchTerm.set(categorie);
+    const value = categorie?.trim() ?? '';
+    this.searchTerm.set(value);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: value ? { category: value } : { category: null },
+      queryParamsHandling: 'merge',
+    });
   }
 
   customFilter(term: string): void {
     this.searchTerm.set(term);
+  }
+
+  toggleSort(key: 'nom' | 'dateNaissance' | 'categorie' | 'email' | 'cotisationDue'): void {
+    const current = this.sortState();
+    const nextDirection = current.key === key && current.direction === 'asc' ? 'desc' : 'asc';
+    this.sortState.set({ key, direction: nextDirection });
+  }
+
+  getSortIcon(
+    key: 'nom' | 'dateNaissance' | 'categorie' | 'email' | 'cotisationDue',
+  ): 'up' | 'down' | 'none' {
+    const current = this.sortState();
+    if (current.key !== key) return 'none';
+    return current.direction === 'asc' ? 'up' : 'down';
   }
 
   formatDate(isoDate: string): string {
@@ -173,7 +271,7 @@ export class MembersListComponent implements OnInit {
       telephone: member.telephone,
       cotisationPayee: member.cotisationPayee,
       cotisationDue: member.cotisationDue,
-      numeroLicenceFFBB: member.numeroLicenceFFBB,
+      FBI: member.FBI,
     });
     this.panelOpen.set(true);
   }
@@ -202,7 +300,7 @@ export class MembersListComponent implements OnInit {
       telephone: v.telephone ?? '',
       cotisationPayee: Number(v.cotisationPayee) || 0,
       cotisationDue: Number(v.cotisationDue) || 0,
-      numeroLicenceFFBB: v.numeroLicenceFFBB ?? '',
+      FBI: v.FBI ?? false,
     };
 
     const id = this.editingId();

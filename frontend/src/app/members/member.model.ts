@@ -1,3 +1,5 @@
+import { DEFAULT_COTISATION_DUE } from '../app';
+
 export const CATEGORIES = ['U7', 'U9', 'U11', 'U13', 'FSGT', 'LOISIR'] as const;
 
 export interface Member {
@@ -11,7 +13,7 @@ export interface Member {
   telephone: string;
   cotisationPayee: number;
   cotisationDue: number;
-  numeroLicenceFFBB: string;
+  FBI: boolean;
 }
 
 export type MemberInput = Omit<Member, 'id'>;
@@ -26,7 +28,7 @@ export function emptyMember(): MemberInput {
     email: '',
     telephone: '',
     cotisationPayee: 0,
-    cotisationDue: 0,
-    numeroLicenceFFBB: '',
+    cotisationDue: DEFAULT_COTISATION_DUE,
+    FBI: false,
   };
 }

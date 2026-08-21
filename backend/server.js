@@ -42,22 +42,26 @@ function rowToMember(row) {
     telephone: row.telephone,
     cotisationPayee: Number(row.cotisation_payee),
     cotisationDue: Number(row.cotisation_due),
-    numeroLicenceFFBB: row.numero_licence_ffbb,
+    FBI: row.fbi,
   };
 }
 
 const MEMBER_FIELDS = [
   'nom', 'prenom', 'sexe', 'dateNaissance', 'categorie',
-  'email', 'telephone', 'cotisationPayee', 'cotisationDue', 'numeroLicenceFFBB',
+  'email', 'telephone', 'cotisationPayee', 'cotisationDue', 'FBI',
 ];
 
 function sanitizeMemberInput(body) {
   const out = {};
   for (const field of MEMBER_FIELDS) {
     if (body[field] === undefined) continue;
-    out[field] = (field === 'cotisationPayee' || field === 'cotisationDue')
-      ? Number(body[field]) || 0
-      : String(body[field]);
+    if (field === 'cotisationPayee' || field === 'cotisationDue') {
+      out[field] = Number(body[field]) || 0;
+    } else if (field === 'FBI') {
+      out[field] = Boolean(body[field]);
+    } else {
+      out[field] = String(body[field]);
+    }
   }
   return out;
 }
@@ -80,16 +84,16 @@ app.post('/api/members', async (req, res) => {
   const member = {
     id: crypto.randomUUID(),
     sexe: '', dateNaissance: '', categorie: '', email: '', telephone: '',
-    cotisationPayee: 0, cotisationDue: 0, numeroLicenceFFBB: '',
+    cotisationPayee: 0, cotisationDue: 0, FBI: false,
     ...data,
   };
   try {
     await pool.query(
       `INSERT INTO members
-        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, numero_licence_ffbb)
+        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, fbi)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [member.id, member.nom, member.prenom, member.sexe, member.dateNaissance, member.categorie,
-        member.email, member.telephone, member.cotisationPayee, member.cotisationDue, member.numeroLicenceFFBB],
+        member.email, member.telephone, member.cotisationPayee, member.cotisationDue, member.FBI],
     );
     res.status(201).json({ member });
   } catch (err) {
@@ -109,11 +113,11 @@ app.put('/api/members/:id', async (req, res) => {
     const { rows } = await pool.query(
       `UPDATE members SET
         nom = $2, prenom = $3, sexe = $4, date_naissance = $5, categorie = $6,
-        email = $7, telephone = $8, cotisation_payee = $9, cotisation_due = $10, numero_licence_ffbb = $11
+        email = $7, telephone = $8, cotisation_payee = $9, cotisation_due = $10, fbi = $11
        WHERE id = $1
        RETURNING *`,
       [req.params.id, updated.nom, updated.prenom, updated.sexe, updated.dateNaissance, updated.categorie,
-        updated.email, updated.telephone, updated.cotisationPayee, updated.cotisationDue, updated.numeroLicenceFFBB],
+        updated.email, updated.telephone, updated.cotisationPayee, updated.cotisationDue, updated.FBI],
     );
     res.json({ member: rowToMember(rows[0]) });
   } catch (err) {
