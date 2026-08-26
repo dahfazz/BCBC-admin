@@ -5,10 +5,11 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CATEGORIES, Member, categoryLabel } from '../members/member.model';
 import { MemberService } from '../members/member.service';
 import { TodoService } from './todo.service';
+import { SidebarService } from './sidebar.service';
 import { AuthService } from '../auth/auth.service';
 import { MAX_ADHERENTS } from '../app';
 
-export type Category = 'U7' | 'U9' | 'U11' | 'U13' | 'LOISIR' | 'FSGT' | '';
+export type Category = 'U7' | 'U9' | 'U11' | 'U13' | 'LOISIR' | 'FSGT' | 'WAITING_LIST' | '';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,6 +22,9 @@ export class SidebarComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private memberService = inject(MemberService);
+  private sidebarService = inject(SidebarService);
+
+  collapsed = this.sidebarService.collapsed;
 
   public readonly MAX_ADHERENTS = MAX_ADHERENTS;
 
@@ -65,6 +69,10 @@ export class SidebarComponent implements OnInit {
     void this.router.navigate(['/adherents'], {
       queryParams: { category },
     });
+  }
+
+  toggleSidebar(): void {
+    this.sidebarService.toggle();
   }
 
   async signOut(): Promise<void> {

@@ -139,6 +139,66 @@ app.delete('/api/members/:id', async (req, res) => {
   }
 });
 
+function rowToTreasuryItem(row) {
+  return {
+    id: row.id,
+    type: row.type,
+    label: row.label,
+    amount: Number(row.amount),
+    date: row.date || undefined,
+  };
+}
+
+app.get('/api/treasury-items', async (_req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM treasury_items ORDER BY date, label');
+    res.json({ items: rows.map(rowToTreasuryItem) });
+  } catch (err) {
+    console.error('Error listing treasury items:', err);
+    res.status(500).json({ error: 'Impossible de récupérer les opérations de trésorerie' });
+  }
+});
+
+app.post('/api/treasury-items', async (req, res) => {
+  const { type, label, amount, date } = req.body || {};
+  if (type !== 'depense' && type !== 'recette') {
+    return res.status(400).json({ error: 'Type invalide' });
+  }
+  if (!label || !amount) {
+    return res.status(400).json({ error: 'Libellé et montant sont obligatoires' });
+  }
+  const item = {
+    id: crypto.randomUUID(),
+    type,
+    label: String(label),
+    amount: Number(amount) || 0,
+    date: date ? String(date) : '',
+  };
+  try {
+    await pool.query(
+      `INSERT INTO treasury_items (id, type, label, amount, date) VALUES ($1, $2, $3, $4, $5)`,
+      [item.id, item.type, item.label, item.amount, item.date],
+    );
+    res.status(201).json({ item: rowToTreasuryItem(item) });
+  } catch (err) {
+    console.error('Error creating treasury item:', err);
+    res.status(500).json({ error: "Impossible de créer l'opération" });
+  }
+});
+
+app.delete('/api/treasury-items/:id', async (req, res) => {
+  try {
+    const { rows } = await pool.query('DELETE FROM treasury_items WHERE id = $1 RETURNING *', [req.params.id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Opération introuvable' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting treasury item:', err);
+    res.status(500).json({ error: "Impossible de supprimer l'opération" });
+  }
+});
+
 function rowToPlanningEvent(row) {
   return {
     id: row.id,

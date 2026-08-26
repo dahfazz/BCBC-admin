@@ -1,0 +1,15 @@
+:host {
+  display: contents;
+}
+
+.page-nav .nav-link {
+  color: var(--bs-primary);
+  font-weight: 500;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.page-nav .nav-link.active {
+  font-weight: 700;
+  border-bottom-color: var(--bs-primary);
+}

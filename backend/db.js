@@ -32,6 +32,16 @@ async function initDb() {
   await pool.query(`ALTER TABLE members ADD COLUMN IF NOT EXISTS fbi BOOLEAN NOT NULL DEFAULT false;`);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS treasury_items (
+      id UUID PRIMARY KEY,
+      type TEXT NOT NULL CHECK (type IN ('depense', 'recette')),
+      label TEXT NOT NULL,
+      amount NUMERIC NOT NULL DEFAULT 0,
+      date TEXT NOT NULL DEFAULT ''
+    );
+  `);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS planning_events (
       id TEXT PRIMARY KEY,
       date TEXT NOT NULL,

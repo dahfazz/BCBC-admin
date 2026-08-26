@@ -6,6 +6,34 @@
   width: 300px;
   flex: 0 0 300px;
   min-height: 100%;
+  position: relative;
+  overflow: visible;
+  transition: flex-basis 0.2s ease, width 0.2s ease;
+
+  &.collapsed {
+    width: 56px;
+    flex: 0 0 56px;
+
+    .sidebar-content {
+      display: none;
+    }
+  }
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 1rem;
+  right: -14px;
+  z-index: 20;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .user-tooltip {

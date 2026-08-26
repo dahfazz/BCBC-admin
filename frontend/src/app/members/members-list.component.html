@@ -6,7 +6,10 @@
   <div class="alert alert-warning">{{ loadError() }}</div>
   }
 
-  <h1 class="mb-5">Adhérents</h1>
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
+    <h1 class="mb-0">Adhérents</h1>
+    <app-page-nav></app-page-nav>
+  </div>
 
   <!-- ── Recherche ──────────────────────────────────────────────────── -->
   <div class="d-flex justify-content-between align-items-start gap-3">
@@ -247,7 +250,7 @@
                 class="w-100 d-block align-self-center btn btn-sm btn-success" title="Catégorie" aria-label="Catégorie">
                 <small>{{ categoryLabel(member.categorie) ?? member.categorie }}</small></button>
             </td>
-            <td class="text-truncate"><a href="mailto:{{ member.email }}">{{ member.email }}</a></td>
+            <td class="text-truncate">{{ member.email }}</td>
             <td class="text-end">
               @if (member.cotisationDue > 0) {
               {{ member.cotisationDue | number:'1.2-2' }} €

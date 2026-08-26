@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SidebarComponent } from '../shared/sidebar.component';
+import { PageNavComponent } from '../shared/page-nav.component';
 import {
   PlanningEventOverride,
   PlanningEventPayload,
@@ -50,7 +51,7 @@ function toDisplayTime(inputValue: string): string {
 
 @Component({
   selector: 'app-planning',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SidebarComponent, PageNavComponent],
   templateUrl: './planning.component.html',
   styleUrl: './planning.component.scss',
 })

@@ -2,13 +2,15 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../shared/sidebar.component';
+import { PageNavComponent } from '../shared/page-nav.component';
 import { MemberService } from '../members/member.service';
 import { Member } from '../members/member.model';
 import { TreasuryService } from './treasury.service';
+import { TreasuryItem } from './treasury.model';
 
 @Component({
   selector: 'app-treasury',
-  imports: [CommonModule, FormsModule, SidebarComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, PageNavComponent],
   templateUrl: './treasury.component.html',
   styleUrl: './treasury.component.scss',
 })
@@ -49,8 +51,8 @@ export class TreasuryComponent implements OnInit {
     return labels.map((label) => ({ label, ...groups.get(label)! }));
   });
 
-  depenses = this.treasuryService.depenses;
-  recettes = this.treasuryService.recettes;
+  depenses = signal<TreasuryItem[]>([]);
+  recettes = signal<TreasuryItem[]>([]);
 
   totalDepenses = computed(() => this.depenses().reduce((sum, i) => sum + i.amount, 0));
   totalRecettesManuelles = computed(() => this.recettes().reduce((sum, i) => sum + i.amount, 0));
@@ -67,6 +69,7 @@ export class TreasuryComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMembers();
+    this.loadTreasuryItems();
   }
 
   loadMembers(): void {
@@ -86,27 +89,71 @@ export class TreasuryComponent implements OnInit {
     });
   }
 
+  loadTreasuryItems(): void {
+    this.treasuryService.list().subscribe({
+      next: (res) => {
+        this.depenses.set(res.items.filter((i) => i.type === 'depense'));
+        this.recettes.set(res.items.filter((i) => i.type === 'recette'));
+      },
+      error: () => {
+        this.loadError.set(
+          'Impossible de charger les opérations de trésorerie. Vérifiez que le serveur est démarré.',
+        );
+      },
+    });
+  }
+
   addDepense(): void {
     if (!this.newDepenseLabel.trim() || !this.newDepenseAmount) return;
-    this.treasuryService.addDepense(this.newDepenseLabel.trim(), this.newDepenseAmount, this.newDepenseDate || undefined);
-    this.newDepenseLabel = '';
-    this.newDepenseAmount = null;
-    this.newDepenseDate = '';
+    this.treasuryService
+      .create({
+        type: 'depense',
+        label: this.newDepenseLabel.trim(),
+        amount: this.newDepenseAmount,
+        date: this.newDepenseDate || undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          this.depenses.update((list) => [...list, res.item]);
+          this.newDepenseLabel = '';
+          this.newDepenseAmount = null;
+          this.newDepenseDate = '';
+        },
+        error: () => this.loadError.set("Impossible d'ajouter la dépense."),
+      });
   }
 
   removeDepense(id: string): void {
-    this.treasuryService.removeDepense(id);
+    this.treasuryService.delete(id).subscribe({
+      next: () => this.depenses.update((list) => list.filter((i) => i.id !== id)),
+      error: () => this.loadError.set('Impossible de supprimer la dépense.'),
+    });
   }
 
   addRecette(): void {
     if (!this.newRecetteLabel.trim() || !this.newRecetteAmount) return;
-    this.treasuryService.addRecette(this.newRecetteLabel.trim(), this.newRecetteAmount, this.newRecetteDate || undefined);
-    this.newRecetteLabel = '';
-    this.newRecetteAmount = null;
-    this.newRecetteDate = '';
+    this.treasuryService
+      .create({
+        type: 'recette',
+        label: this.newRecetteLabel.trim(),
+        amount: this.newRecetteAmount,
+        date: this.newRecetteDate || undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          this.recettes.update((list) => [...list, res.item]);
+          this.newRecetteLabel = '';
+          this.newRecetteAmount = null;
+          this.newRecetteDate = '';
+        },
+        error: () => this.loadError.set("Impossible d'ajouter la recette."),
+      });
   }
 
   removeRecette(id: string): void {
-    this.treasuryService.removeRecette(id);
+    this.treasuryService.delete(id).subscribe({
+      next: () => this.recettes.update((list) => list.filter((i) => i.id !== id)),
+      error: () => this.loadError.set('Impossible de supprimer la recette.'),
+    });
   }
 }

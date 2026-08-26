@@ -5,11 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MemberService } from './member.service';
 import { Member, MemberInput, CATEGORIES, categoryLabel, emptyMember } from './member.model';
 import { Category, SidebarComponent } from '../shared/sidebar.component';
+import { PageNavComponent } from '../shared/page-nav.component';
 import { DEFAULT_COTISATION_DUE } from '../app';
 
 @Component({
   selector: 'app-members-list',
-  imports: [CommonModule, ReactiveFormsModule, SidebarComponent],
+  imports: [CommonModule, ReactiveFormsModule, SidebarComponent, PageNavComponent],
   templateUrl: './members-list.component.html',
   styleUrl: './members-list.component.scss',
 })
@@ -70,7 +71,9 @@ export class MembersListComponent implements OnInit {
       case this.FEMALES:
         return list.filter((m) => m.sexe === 'F');
       case this.FBI:
-        return list.filter((m) => !m.FBI && m.categorie !== 'FSGT');
+        return list.filter(
+          (m) => !m.FBI && m.categorie !== 'FSGT' && m.categorie !== 'WAITING_LIST',
+        );
       default:
         return list.filter((m) =>
           `${m.nom} ${m.prenom} ${m.email} ${m.categorie}`.toLowerCase().includes(term),
