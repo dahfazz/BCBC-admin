@@ -26,9 +26,11 @@
         <div class="category-section">
           <div class="small text-uppercase text-white-50 mb-2 px-1">Catégories</div>
           @for (category of categoryLinks; track category) {
-          <a class="ps-1 text-white nav-link small" [routerLink]="['/adherents']" [queryParams]="{ category }"
-            routerLinkActive="active">
-            {{ categoryLabel(category) }} ({{ categoryCount(category) }}/{{ MAX_ADHERENTS_PER_CATEGORY }})
+          <a class="ps-1 text-white nav-link small"
+            [class.fw-bold]="categoryCount(category) === MAX_ADHERENTS[category] && !!MAX_ADHERENTS[category]"
+            [routerLink]="['/adherents']" [queryParams]="{ category }" routerLinkActive="active">
+            {{ categoryLabel(category) }} ({{ categoryCount(category) }}{{ MAX_ADHERENTS[category] ? '/' +
+            MAX_ADHERENTS[category] : '' }})
           </a>
           }
         </div>

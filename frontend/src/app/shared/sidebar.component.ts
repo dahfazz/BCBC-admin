@@ -6,7 +6,9 @@ import { CATEGORIES, Member, categoryLabel } from '../members/member.model';
 import { MemberService } from '../members/member.service';
 import { TodoService } from './todo.service';
 import { AuthService } from '../auth/auth.service';
-import { MAX_ADHERENTS_PER_CATEGORY } from '../app';
+import { MAX_ADHERENTS } from '../app';
+
+export type Category = 'U7' | 'U9' | 'U11' | 'U13' | 'LOISIR' | 'FSGT' | '';
 
 @Component({
   selector: 'app-sidebar',
@@ -20,7 +22,7 @@ export class SidebarComponent implements OnInit {
   private router = inject(Router);
   private memberService = inject(MemberService);
 
-  public readonly MAX_ADHERENTS_PER_CATEGORY = MAX_ADHERENTS_PER_CATEGORY;
+  public readonly MAX_ADHERENTS = MAX_ADHERENTS;
 
   readonly categoryLinks = [
     'U7/U9',
@@ -31,7 +33,7 @@ export class SidebarComponent implements OnInit {
 
   private members = signal<Member[]>([]);
 
-  private groupLabel(categorie: string): string {
+  private groupLabel(categorie: Category): string {
     return categorie === 'U7' || categorie === 'U9' ? 'U7/U9' : categorie || 'Autre';
   }
 

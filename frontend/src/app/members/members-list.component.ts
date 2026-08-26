@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MemberService } from './member.service';
 import { Member, MemberInput, CATEGORIES, categoryLabel, emptyMember } from './member.model';
-import { SidebarComponent } from '../shared/sidebar.component';
+import { Category, SidebarComponent } from '../shared/sidebar.component';
 import { DEFAULT_COTISATION_DUE } from '../app';
 
 @Component({
@@ -177,7 +177,7 @@ export class MembersListComponent implements OnInit {
     prenom: ['', Validators.required],
     sexe: ['', Validators.required],
     dateNaissance: [''],
-    categorie: ['', Validators.required],
+    categorie: ['' as Category, Validators.required],
     email: ['', Validators.email],
     telephone: [''],
     cotisationPayee: [0, [Validators.required, Validators.min(0)]],
@@ -296,7 +296,7 @@ export class MembersListComponent implements OnInit {
       prenom: v.prenom ?? '',
       sexe: (v.sexe ?? '') as Member['sexe'],
       dateNaissance: v.dateNaissance ?? '',
-      categorie: v.categorie ?? '',
+      categorie: v.categorie ?? ('' as Category),
       email: v.email ?? '',
       telephone: v.telephone ?? '',
       cotisationPayee: Number(v.cotisationPayee) || 0,
