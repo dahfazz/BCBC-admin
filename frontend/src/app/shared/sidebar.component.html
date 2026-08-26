@@ -28,10 +28,12 @@
           @for (category of categoryLinks; track category) {
           <a class="ps-1 text-white nav-link small" [routerLink]="['/adherents']" [queryParams]="{ category }"
             routerLinkActive="active">
-            {{ category }}
+            {{ categoryLabel(category) }} ({{ categoryCount(category) }}/{{ MAX_ADHERENTS_PER_CATEGORY }})
           </a>
           }
         </div>
+
+        <hr class="border-white border-lg" />
 
         <a class="ps-1 text-white nav-link" href="https://extranet.ffbb.com/fbi/connexion.fbi" target="_blank"
           rel="noopener noreferrer">FBI</a>

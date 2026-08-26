@@ -19,20 +19,20 @@
   <ul class="nav mb-4">
     <li class="nav-item">
       <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(MISSING_DATES)">Dates de
-        naissance manquantes</button>
+        (click)="customFilter(MISSING_DATES)"><small>Dates de
+          naissance manquantes</small></button>
     </li>
     <li class="nav-item">
       <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(MISSING_PAYMENTS)">Cotisations incomplètes</button>
+        (click)="customFilter(MISSING_PAYMENTS)"><small>Cotisations incomplètes</small></button>
     </li>
     <li class="nav-item">
       <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(FEMALES)">Féminines</button>
+        (click)="customFilter(FEMALES)"><small>Féminines</small></button>
     </li>
     <li class="nav-item">
-      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(FBI)">FBI manquants</button>
+      <button type="button" class="p-0 me-3 nav-link text-decoration-underline" (click)="customFilter(FBI)"><small>FBI
+          manquants</small></button>
     </li>
   </ul>
 
@@ -245,7 +245,7 @@
             <td class="text-truncate text-center">
               <button (click)="filterByCat(member.categorie)" type="button"
                 class="w-100 d-block align-self-center btn btn-sm btn-success" title="Catégorie" aria-label="Catégorie">
-                <small>{{member.categorie }}</small></button>
+                <small>{{ categoryLabel(member.categorie) ?? member.categorie }}</small></button>
             </td>
             <td class="text-truncate"><a href="mailto:{{ member.email }}">{{ member.email }}</a></td>
             <td class="text-end">
@@ -317,7 +317,7 @@
           <select class="form-select" formControlName="categorie" [class.is-invalid]="isInvalid('categorie')">
             <option value="">Sélectionnez</option>
             @for (cat of categories; track cat) {
-            <option [value]="cat">{{ cat }}</option>
+            <option [value]="cat">{{ categoryLabel(cat) }}</option>
             }
           </select>
           <div class="invalid-feedback">Champ obligatoire</div>

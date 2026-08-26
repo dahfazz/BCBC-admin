@@ -1,6 +1,14 @@
 import { DEFAULT_COTISATION_DUE } from '../app';
 
-export const CATEGORIES = ['U7', 'U9', 'U11', 'U13', 'FSGT', 'LOISIR'] as const;
+export const CATEGORIES = ['U7', 'U9', 'U11', 'U13', 'FSGT', 'LOISIR', 'WAITING_LIST'] as const;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  WAITING_LIST: "Liste d'attente",
+};
+
+export function categoryLabel(categorie: string): string {
+  return CATEGORY_LABELS[categorie] ?? categorie;
+}
 
 export interface Member {
   id: string;

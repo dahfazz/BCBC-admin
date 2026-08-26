@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MemberService } from './member.service';
-import { Member, MemberInput, CATEGORIES, emptyMember } from './member.model';
+import { Member, MemberInput, CATEGORIES, categoryLabel, emptyMember } from './member.model';
 import { SidebarComponent } from '../shared/sidebar.component';
 import { DEFAULT_COTISATION_DUE } from '../app';
 
@@ -25,6 +25,7 @@ export class MembersListComponent implements OnInit {
   public FBI = 'fbi-missing';
 
   readonly categories = CATEGORIES;
+  readonly categoryLabel = categoryLabel;
 
   members = signal<Member[]>([]);
   loading = signal(false);

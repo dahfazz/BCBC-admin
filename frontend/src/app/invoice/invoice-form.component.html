@@ -140,7 +140,7 @@
                    [class.is-invalid]="isInvalid('section')">
               <option value="">Sélectionnez une section</option>
               @for (cat of categories; track cat) {
-                <option [value]="cat">{{ cat }}</option>
+                <option [value]="cat">{{ categoryLabel(cat) }}</option>
               }
             </select>
             <div class="invalid-feedback">Champ obligatoire</div>

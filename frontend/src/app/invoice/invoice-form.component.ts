@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { InvoiceService } from './invoice.service';
 import { MemberService } from '../members/member.service';
-import { Member, CATEGORIES } from '../members/member.model';
+import { Member, CATEGORIES, categoryLabel } from '../members/member.model';
 
 @Component({
   selector: 'app-invoice-form',
@@ -19,6 +19,7 @@ export class InvoiceFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
 
   readonly categories = CATEGORIES;
+  readonly categoryLabel = categoryLabel;
 
   saving = signal(false);
   saved = signal(false);
