@@ -42,44 +42,24 @@
   <!-- ── Tableau des adhérents ──────────────────────────────────────── -->
   <div class="" style="overflow-x: auto; max-height: 600px;">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <style>
+        td,
+        th {
+          border-right: 1px solid var(--bs-border-color) !important;
+        }
+      </style>
+      <table class="table table-hover  align-middle mb-0">
         <colgroup>
-          <col style="width: 8%"> <!-- # -->
           <col style="width: 28%"> <!-- Nom -->
           <col style="width: 20%"> <!-- Date -->
           <col style="width: 6%"> <!-- Cat. -->
-          <col style="width: 26%"> <!-- Email -->
-          <col style="width: 10%"> <!-- Dû -->
+          <col style="width: 12%"> <!-- Email -->
+          <col style="width: 12%"> <!-- Tél -->
+          <col style="width: 16%"> <!-- Dû -->
           <col style="width: 15%"> <!-- Actions -->
         </colgroup>
         <thead class="table-light">
           <tr>
-            <th class="text-center">
-              <button type="button"
-                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
-                (click)="toggleSort('nom')">
-                <span>#</span>
-                @if (getSortIcon('nom') === 'up') {
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
-                  aria-hidden="true">
-                  <path
-                    d="M7.247 4.86l-4.5 6.33a.75.75 0 0 0 .63 1.17h9.246a.75.75 0 0 0 .63-1.17l-4.5-6.33a.75.75 0 0 0-1.246 0z" />
-                </svg>
-                } @else if (getSortIcon('nom') === 'down') {
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
-                  aria-hidden="true">
-                  <path
-                    d="M7.247 11.14L2.747 4.81A.75.75 0 0 1 3.377 4h9.246a.75.75 0 0 1 .63 1.17l-4.5 6.33a.75.75 0 0 1-1.246 0z" />
-                </svg>
-                } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 16 16"
-                  aria-hidden="true">
-                  <path
-                    d="M8 2.75a.75.75 0 0 1 .75.75v7.19l1.72-1.72a.75.75 0 1 1 1.06 1.06l-3 3a.75.75 0 0 1-1.06 0l-3-3a.75.75 0 1 1 1.06-1.06l1.72 1.72V3.5A.75.75 0 0 1 8 2.75z" />
-                </svg>
-                }
-              </button>
-            </th>
             <th>
               <button type="button"
                 class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
@@ -185,6 +165,9 @@
               </button>
             </th>
             <th>
+              Tél.
+            </th>
+            <th>
               <button type="button"
                 class="btn btn-link p-0 text-decoration-none text-reset fw-semibold d-inline-flex align-items-center gap-1"
                 (click)="toggleSort('cotisationDue')">
@@ -225,18 +208,15 @@
           } @else {
           @for (member of sortedMembers(); track member.id) {
           <tr>
-            <td class="text-truncate text-center">
-              <span class="ms-2 my-2 avatar badge rounded-pill">{{ getMemberLetters(member) }}</span>
-            </td>
             <td class="text-truncate">
               <button type="button"
-                class="btn btn-link p-0 text-reset text-decoration-none member-name-btn d-flex align-items-center"
+                class="btn btn-link p-0 text-black text-decoration-none member-name-btn d-flex align-items-center"
                 (click)="openMemberPanel(member)">
-                <span>{{ member.prenom }} {{ member.nom }}</span>
-                <span class="ms-2 badge rounded-pill text-bg-light">{{ member.sexe }}</span>
+                <span class="text-black">{{ member.prenom }} {{ member.nom }}</span>
+                <span class="ms-2 text-black fw-bolder">{{ member.sexe === 'F' ? '♀' : '♂' }}</span>
               </button>
             </td>
-            <td class="text-truncate" [ngClass]="{'text-center': !member.dateNaissance}">
+            <td class="text-truncate text-center" style="max-width: 130px;">
               @if (!member.dateNaissance) {
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
                 class="text-danger me-1" viewBox="0 0 16 16" title="Date de naissance inconnue">
@@ -251,13 +231,14 @@
                 <small>{{ categoryLabel(member.categorie) ?? member.categorie }}</small></button>
             </td>
             <td class="text-truncate">{{ member.email }}</td>
-            <td class="text-end">
+            <td class="text-truncate" style="max-width: 130px">{{ member.telephone }}</td>
+            <td class="text-end text-nowrap">
               @if (member.cotisationDue > 0) {
               {{ member.cotisationDue | number:'1.2-2' }} €
               } @else {-}
             </td>
-            <td class="text-end text-nowrap">
-              <button type="button" class="ms-4 btn btn-outline-secondary btn-icon-square" title="Modifier"
+            <td class="text-center">
+              <button type="button" class="btn btn-outline-primary btn-icon-square" title="Modifier"
                 aria-label="Modifier" (click)="openMemberPanel(member)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                   <path
@@ -272,7 +253,7 @@
       </table>
     </div>
   </div>
-  <div class="text-primary small mt-4 ps-4">
+  <div class="text-primary border-top p-3 small mt-3">
     {{ summary().total }} ligne(s)
   </div>
 </div>

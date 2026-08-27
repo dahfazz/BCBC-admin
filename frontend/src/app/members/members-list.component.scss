@@ -1,6 +1,12 @@
 :host {
   display: flex;
   flex: 1;
+
+  .btn-success {
+    --bs-btn-bg: #dffeed;
+    --bs-btn-color: #000;
+    --bs-btn-border-width: 0;
+  }
 }
 
 .members-main {
