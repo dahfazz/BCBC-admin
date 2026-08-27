@@ -175,6 +175,8 @@ export class MembersListComponent implements OnInit {
   deleteTarget = signal<Member | null>(null);
   deleting = signal(false);
 
+  copiedField = signal<{ id: string; field: 'telephone' | 'email' } | null>(null);
+
   form = this.fb.group({
     nom: ['', Validators.required],
     prenom: ['', Validators.required],
@@ -351,5 +353,18 @@ export class MembersListComponent implements OnInit {
 
   generateInvoice(member: Member): void {
     this.router.navigate(['/factures', member.id]);
+  }
+
+  copyField(member: Member, field: 'telephone' | 'email'): void {
+    const value = member[field];
+    if (!value) return;
+    navigator.clipboard.writeText(value).then(() => {
+      this.copiedField.set({ id: member.id, field });
+      setTimeout(() => {
+        if (this.copiedField()?.id === member.id && this.copiedField()?.field === field) {
+          this.copiedField.set(null);
+        }
+      }, 1500);
+    });
   }
 }

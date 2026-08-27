@@ -7,37 +7,32 @@
   }
 
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
-    <h1 class="mb-0">Adhérents</h1>
+    <div class="d-flex align-items-center flex-wrap">
+      <h1 class="mb-0">Adhérents</h1>
+      <input type="search" class="ms-4 mt-2 form-control border-black" style="width: 400px" placeholder="🔎 Rechercher"
+        [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)">
+    </div>
     <app-page-nav></app-page-nav>
   </div>
 
-  <!-- ── Recherche ──────────────────────────────────────────────────── -->
-  <div class="d-flex justify-content-between align-items-start gap-3">
-    <input type="search" class="form-control w-50 border-black" placeholder="🔎 Rechercher" [value]="searchTerm()"
-      (input)="searchTerm.set($any($event.target).value)">
-    <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="openCreatePanel()">+ Ajouter un
+  <div class="d-flex justify-content-between align-items-center mb-4 ">
+    <ul class="nav">
+      <li class="nav-item">
+        <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
+          (click)="customFilter(MISSING_PAYMENTS)"><small>Cotisations incomplètes</small></button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
+          (click)="customFilter(FEMALES)"><small>Féminines</small></button>
+      </li>
+      <li class="nav-item">
+        <button type="button" class="p-0 me-3 nav-link text-decoration-underline" (click)="customFilter(FBI)"><small>FBI
+            manquants</small></button>
+      </li>
+    </ul>
+    <button type="button" class="btn btn-lg btn-sm btn-primary text-nowrap" (click)="openCreatePanel()">+ Ajouter un
       adhérent</button>
   </div>
-
-  <ul class="nav mb-4">
-    <li class="nav-item">
-      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(MISSING_DATES)"><small>Dates de
-          naissance manquantes</small></button>
-    </li>
-    <li class="nav-item">
-      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(MISSING_PAYMENTS)"><small>Cotisations incomplètes</small></button>
-    </li>
-    <li class="nav-item">
-      <button type="button" class="p-0 me-3 nav-link text-decoration-underline"
-        (click)="customFilter(FEMALES)"><small>Féminines</small></button>
-    </li>
-    <li class="nav-item">
-      <button type="button" class="p-0 me-3 nav-link text-decoration-underline" (click)="customFilter(FBI)"><small>FBI
-          manquants</small></button>
-    </li>
-  </ul>
 
   <!-- ── Tableau des adhérents ──────────────────────────────────────── -->
   <div class="" style="overflow-x: auto; max-height: 600px;">
@@ -225,14 +220,60 @@
               </svg>
               }{{ formatDate(member.dateNaissance) }}
             </td>
-            <td class="text-truncate text-center">
+            <td class="text-truncate text-center" style="max-width: 120px;">
               <button (click)="filterByCat(member.categorie)" type="button"
                 class="w-100 d-block align-self-center btn btn-sm btn-success" title="Catégorie" aria-label="Catégorie">
                 <small>{{ categoryLabel(member.categorie) ?? member.categorie }}</small></button>
             </td>
-            <td class="text-truncate">{{ member.email }}</td>
-            <td class="text-truncate" style="max-width: 130px">{{ member.telephone }}</td>
-            <td class="text-end text-nowrap">
+            <td class="text-truncate" style="max-width: 290px">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-truncate">{{ member.email }}</span>
+                @if (member.email) {
+                <button type="button" class="mx-1 btn btn-link p-0 lh-1 text-primary" title="Copier l'adresse mail"
+                  aria-label="Copier l'adresse mail" (click)="copyField(member, 'email')">
+                  @if (copiedField()?.id === member.id && copiedField()?.field === 'email') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                    class="text-success" viewBox="0 0 16 16" aria-hidden="true">
+                    <path
+                      d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+                  </svg>
+                  } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"
+                    aria-hidden="true">
+                    <path
+                      d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6z" />
+                    <path d="M2 5a1 1 0 0 0-1 1v8a2 2 0 0 0 2 2h8a1 1 0 0 0 1-1H3a1 1 0 0 1-1-1V5z" />
+                  </svg>
+                  }
+                </button>
+                }
+              </div>
+            </td>
+            <td class="text-truncate" style="max-width: 150px">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-truncate">{{ member.telephone }}</span>
+                @if (member.telephone) {
+                <button type="button" class="mx-1 btn btn-link p-0 lh-1 text-primary" title="Copier le numéro"
+                  aria-label="Copier le numéro" (click)="copyField(member, 'telephone')">
+                  @if (copiedField()?.id === member.id && copiedField()?.field === 'telephone') {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                    class="text-success" viewBox="0 0 16 16" aria-hidden="true">
+                    <path
+                      d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+                  </svg>
+                  } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"
+                    aria-hidden="true">
+                    <path
+                      d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6z" />
+                    <path d="M2 5a1 1 0 0 0-1 1v8a2 2 0 0 0 2 2h8a1 1 0 0 0 1-1H3a1 1 0 0 1-1-1V5z" />
+                  </svg>
+                  }
+                </button>
+                }
+              </div>
+            </td>
+            <td class="text-end text-nowrap" style="max-width: 80px;">
               @if (member.cotisationDue > 0) {
               {{ member.cotisationDue | number:'1.2-2' }} €
               } @else {-}
