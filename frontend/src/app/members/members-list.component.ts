@@ -3,14 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MemberService } from './member.service';
-import { Member, MemberInput, CATEGORIES, categoryLabel, emptyMember } from './member.model';
-import { Category, SidebarComponent } from '../shared/sidebar.component';
+import {
+  Member,
+  MemberInput,
+  CATEGORIES,
+  categoryLabel,
+  emptyMember,
+  Category,
+} from './member.model';
 import { PageNavComponent } from '../shared/page-nav.component';
 import { DEFAULT_COTISATION_DUE } from '../app';
 
 @Component({
   selector: 'app-members-list',
-  imports: [CommonModule, ReactiveFormsModule, SidebarComponent, PageNavComponent],
+  imports: [CommonModule, ReactiveFormsModule, PageNavComponent],
   templateUrl: './members-list.component.html',
   styleUrl: './members-list.component.scss',
 })

@@ -1,17 +1,9 @@
 :host {
-  display: flex;
-  flex: 1;
-
   .btn-success {
     --bs-btn-bg: #dffeed;
     --bs-btn-color: #000;
     --bs-btn-border-width: 0;
   }
-}
-
-.members-main {
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 .modal-backdrop-custom {
@@ -39,29 +31,29 @@
   }
 }
 
-.member-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(600px, 100vw);
-  background: #fff;
-  box-shadow: -0.5rem 0 1.5rem rgba(0, 0, 0, 0.15);
-  z-index: 1060;
-  display: flex;
-  flex-direction: column;
-  animation: member-panel-slide-in 0.2s ease-out;
-}
+// .member-panel {
+//   position: fixed;
+//   top: 0;
+//   right: 0;
+//   bottom: 0;
+//   width: min(600px, 100vw);
+//   background: #fff;
+//   box-shadow: -0.5rem 0 1.5rem rgba(0, 0, 0, 0.15);
+//   z-index: 1060;
+//   display: flex;
+//   flex-direction: column;
+//   animation: member-panel-slide-in 0.2s ease-out;
+// }
 
-@keyframes member-panel-slide-in {
-  from {
-    transform: translateX(100%);
-  }
+// @keyframes member-panel-slide-in {
+//   from {
+//     transform: translateX(100%);
+//   }
 
-  to {
-    transform: translateX(0);
-  }
-}
+//   to {
+//     transform: translateX(0);
+//   }
+// }
 
 .btn-icon-square {
   display: inline-flex;
@@ -93,3 +85,29 @@
 .table thead th {
   vertical-align: middle;
 }
+
+
+.member-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(600px, 100vw);
+  background: #fff;
+  box-shadow: -0.5rem 0 1.5rem rgba(0, 0, 0, 0.15);
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  animation: member-panel-slide-in 0.2s ease-out;
+}
+
+@keyframes member-panel-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+

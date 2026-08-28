@@ -1,7 +1,8 @@
 import { DEFAULT_COTISATION_DUE } from '../app';
-import { Category } from '../shared/sidebar.component';
 
 export const CATEGORIES = ['U7', 'U9', 'U11', 'U13', 'FSGT', 'LOISIR', 'WAITING_LIST'] as const;
+
+export type Category = (typeof CATEGORIES)[number] | '';
 
 const CATEGORY_LABELS: Record<string, string> = {
   WAITING_LIST: "Liste d'attente",

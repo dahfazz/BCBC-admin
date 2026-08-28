@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SidebarComponent } from '../shared/sidebar.component';
 import { PageNavComponent } from '../shared/page-nav.component';
 import {
   PlanningEventOverride,
@@ -51,7 +50,7 @@ function toDisplayTime(inputValue: string): string {
 
 @Component({
   selector: 'app-planning',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SidebarComponent, PageNavComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, PageNavComponent],
   templateUrl: './planning.component.html',
   styleUrl: './planning.component.scss',
 })
@@ -240,7 +239,8 @@ export class PlanningComponent implements OnInit {
       type: (v.type ?? 'entrainement') as SessionType,
       opponent: v.opponent ?? '',
       scoreFor: v.scoreFor === null || v.scoreFor === undefined ? null : Number(v.scoreFor),
-      scoreAgainst: v.scoreAgainst === null || v.scoreAgainst === undefined ? null : Number(v.scoreAgainst),
+      scoreAgainst:
+        v.scoreAgainst === null || v.scoreAgainst === undefined ? null : Number(v.scoreAgainst),
       cancelled: false,
     };
 
@@ -278,7 +278,9 @@ export class PlanningComponent implements OnInit {
     };
 
     if (isTemplateId(session.id)) {
-      this.eventsService.upsert(session.id, overrideToPayload(session, true)).subscribe({ next: done, error: done });
+      this.eventsService
+        .upsert(session.id, overrideToPayload(session, true))
+        .subscribe({ next: done, error: done });
     } else {
       this.eventsService.remove(session.id).subscribe({ next: done, error: done });
     }

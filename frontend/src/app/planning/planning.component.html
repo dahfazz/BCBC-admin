@@ -1,11 +1,13 @@
-<app-sidebar></app-sidebar>
-
-<div class="app-container planning-main p-5">
-  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-1">
-    <h1 class="mb-0">Planning</h1>
-    <app-page-nav></app-page-nav>
+<header class="text-white p-5 bg-primary d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center">
+    <div>
+      <h1 class="mb-0">Planning</h1>
+    </div>
   </div>
-  <div class="text-muted mb-4">{{ seasonLabel }}</div>
+  <app-page-nav class="ms-auto"></app-page-nav>
+</header>
+
+<div class="p-5 pt-1">
 
   @if (loadError()) {
   <div class="alert alert-warning">{{ loadError() }}</div>
@@ -38,15 +40,14 @@
             <div class="hour-line" [style.top.px]="hourOffset(h)"></div>
             }
             @for (session of day.sessions; track session.id) {
-            <button type="button" class="event-block"
-              [ngStyle]="eventStyle(session)"
-              [ngClass]="session.type === 'match' ? 'event-match' : 'event-training'"
-              (click)="openEditEvent(session)">
+            <button type="button" class="event-block" [ngStyle]="eventStyle(session)"
+              [ngClass]="session.type === 'match' ? 'event-match' : 'event-training'" (click)="openEditEvent(session)">
               <div class="event-time">{{ session.startTime }}–{{ session.endTime }}</div>
               <div class="event-label text-truncate">{{ session.label }}</div>
               @if (session.type === 'match') {
               <div class="event-opponent text-truncate">vs {{ session.opponent }}</div>
-              @if (session.scoreFor !== null && session.scoreFor !== undefined && session.scoreAgainst !== null && session.scoreAgainst !== undefined) {
+              @if (session.scoreFor !== null && session.scoreFor !== undefined && session.scoreAgainst !== null &&
+              session.scoreAgainst !== undefined) {
               <div class="event-score">{{ session.scoreFor }} – {{ session.scoreAgainst }}</div>
               }
               } @else if (session.coach) {
@@ -117,8 +118,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Heure de fin <span class="text-danger">*</span></label>
-          <input type="time" class="form-control" formControlName="endTime"
-            [class.is-invalid]="isInvalid('endTime')">
+          <input type="time" class="form-control" formControlName="endTime" [class.is-invalid]="isInvalid('endTime')">
           <div class="invalid-feedback">Champ obligatoire</div>
         </div>
 

@@ -1,7 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../shared/sidebar.component';
 import { PageNavComponent } from '../shared/page-nav.component';
 import { MemberService } from '../members/member.service';
 import { Member } from '../members/member.model';
@@ -10,7 +9,7 @@ import { TreasuryItem } from './treasury.model';
 
 @Component({
   selector: 'app-treasury',
-  imports: [CommonModule, FormsModule, SidebarComponent, PageNavComponent],
+  imports: [CommonModule, FormsModule, PageNavComponent],
   templateUrl: './treasury.component.html',
   styleUrl: './treasury.component.scss',
 })

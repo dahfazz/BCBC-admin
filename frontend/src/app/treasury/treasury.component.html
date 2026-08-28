@@ -1,14 +1,13 @@
-<app-sidebar></app-sidebar>
-
-<div class="app-container treasury-main p-5">
-  @if (loadError()) {
-    <div class="alert alert-warning">{{ loadError() }}</div>
-  }
-
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-5">
-    <h1 class="mb-0">Trésorerie</h1>
-    <app-page-nav></app-page-nav>
+<header class="text-white p-5 bg-primary d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center">
+    <div>
+      <h1 class="mb-0">Trésorerie</h1>
+    </div>
   </div>
+  <app-page-nav class="ms-auto"></app-page-nav>
+</header>
+
+<div class="p-5">
 
   <!-- ── Suivi des cotisations ─────────────────────────────────────── -->
   <h2 class="h5 mb-3">Suivi des cotisations</h2>
@@ -48,27 +47,28 @@
         <div class="card-header bg-white fw-semibold">Dépenses</div>
         <ul class="list-group list-group-flush">
           @for (item of depenses(); track item.id) {
-            <li class="list-group-item d-flex align-items-center gap-2">
-              <span class="flex-grow-1">
-                {{ item.label }}
-                @if (item.date) { <span class="text-muted small ms-1">({{ item.date }})</span> }
-              </span>
-              <span class="text-nowrap text-danger">-{{ item.amount | number:'1.2-2' }} €</span>
-              <button type="button" class="btn-close" aria-label="Supprimer" (click)="removeDepense(item.id)"></button>
-            </li>
+          <li class="list-group-item d-flex align-items-center gap-2">
+            <span class="flex-grow-1">
+              {{ item.label }}
+              @if (item.date) { <span class="text-muted small ms-1">({{ item.date }})</span> }
+            </span>
+            <span class="text-nowrap text-danger">-{{ item.amount | number:'1.2-2' }} €</span>
+            <button type="button" class="btn-close" aria-label="Supprimer" (click)="removeDepense(item.id)"></button>
+          </li>
           } @empty {
-            <li class="list-group-item text-muted small">Aucune dépense enregistrée.</li>
+          <li class="list-group-item text-muted small">Aucune dépense enregistrée.</li>
           }
         </ul>
         <div class="card-footer bg-white">
           <form class="d-flex flex-wrap gap-2" (ngSubmit)="addDepense()">
             <input type="text" class="form-control form-control-sm flex-grow-1" style="min-width: 8rem"
-                   placeholder="Libellé (ex. Ballons)" name="newDepenseLabel" [(ngModel)]="newDepenseLabel">
+              placeholder="Libellé (ex. Ballons)" name="newDepenseLabel" [(ngModel)]="newDepenseLabel">
             <input type="number" class="form-control form-control-sm" style="width: 7rem" min="0" step="0.01"
-                   placeholder="Montant €" name="newDepenseAmount" [(ngModel)]="newDepenseAmount">
-            <input type="date" class="form-control form-control-sm" style="width: 9rem"
-                   name="newDepenseDate" [(ngModel)]="newDepenseDate">
-            <button type="submit" class="btn btn-sm btn-outline-danger" [disabled]="!newDepenseLabel.trim() || !newDepenseAmount">
+              placeholder="Montant €" name="newDepenseAmount" [(ngModel)]="newDepenseAmount">
+            <input type="date" class="form-control form-control-sm" style="width: 9rem" name="newDepenseDate"
+              [(ngModel)]="newDepenseDate">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+              [disabled]="!newDepenseLabel.trim() || !newDepenseAmount">
               + Ajouter
             </button>
           </form>
@@ -90,25 +90,26 @@
             <span class="text-nowrap text-success">+{{ cotisationSummary().totalDue | number:'1.2-2' }} €</span>
           </li>
           @for (item of recettes(); track item.id) {
-            <li class="list-group-item d-flex align-items-center gap-2">
-              <span class="flex-grow-1">
-                {{ item.label }}
-                @if (item.date) { <span class="text-muted small ms-1">({{ item.date }})</span> }
-              </span>
-              <span class="text-nowrap text-success">+{{ item.amount | number:'1.2-2' }} €</span>
-              <button type="button" class="btn-close" aria-label="Supprimer" (click)="removeRecette(item.id)"></button>
-            </li>
+          <li class="list-group-item d-flex align-items-center gap-2">
+            <span class="flex-grow-1">
+              {{ item.label }}
+              @if (item.date) { <span class="text-muted small ms-1">({{ item.date }})</span> }
+            </span>
+            <span class="text-nowrap text-success">+{{ item.amount | number:'1.2-2' }} €</span>
+            <button type="button" class="btn-close" aria-label="Supprimer" (click)="removeRecette(item.id)"></button>
+          </li>
           }
         </ul>
         <div class="card-footer bg-white">
           <form class="d-flex flex-wrap gap-2" (ngSubmit)="addRecette()">
             <input type="text" class="form-control form-control-sm flex-grow-1" style="min-width: 8rem"
-                   placeholder="Libellé (ex. Subvention)" name="newRecetteLabel" [(ngModel)]="newRecetteLabel">
+              placeholder="Libellé (ex. Subvention)" name="newRecetteLabel" [(ngModel)]="newRecetteLabel">
             <input type="number" class="form-control form-control-sm" style="width: 7rem" min="0" step="0.01"
-                   placeholder="Montant €" name="newRecetteAmount" [(ngModel)]="newRecetteAmount">
-            <input type="date" class="form-control form-control-sm" style="width: 9rem"
-                   name="newRecetteDate" [(ngModel)]="newRecetteDate">
-            <button type="submit" class="btn btn-sm btn-outline-success" [disabled]="!newRecetteLabel.trim() || !newRecetteAmount">
+              placeholder="Montant €" name="newRecetteAmount" [(ngModel)]="newRecetteAmount">
+            <input type="date" class="form-control form-control-sm" style="width: 9rem" name="newRecetteDate"
+              [(ngModel)]="newRecetteDate">
+            <button type="submit" class="btn btn-sm btn-outline-success"
+              [disabled]="!newRecetteLabel.trim() || !newRecetteAmount">
               + Ajouter
             </button>
           </form>
