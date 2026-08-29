@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -182,6 +182,45 @@ export class MembersListComponent implements OnInit {
   deleting = signal(false);
 
   copiedField = signal<{ id: string; field: 'telephone' | 'email' } | null>(null);
+  copiedAllEmails = signal(false);
+
+  displayedEmails = computed(() =>
+    [...new Set(
+      this.sortedMembers()
+        .map((m) => m.email.trim())
+        .filter((e) => e.length > 0),
+    )],
+  );
+
+  copyAllEmails(): void {
+    const emails = this.displayedEmails();
+    if (emails.length === 0) return;
+    navigator.clipboard.writeText(emails.join('; ')).then(() => {
+      this.copiedAllEmails.set(true);
+      setTimeout(() => this.copiedAllEmails.set(false), 1500);
+    });
+  }
+
+  openNoteId = signal<string | null>(null);
+  notePos = signal<{ top: number; left: number } | null>(null);
+
+  toggleNote(id: string, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.openNoteId() === id) {
+      this.openNoteId.set(null);
+      return;
+    }
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.notePos.set({ top: rect.bottom + 6, left: rect.left });
+    this.openNoteId.set(id);
+  }
+
+  @HostListener('document:click')
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  closeNote(): void {
+    if (this.openNoteId()) this.openNoteId.set(null);
+  }
 
   form = this.fb.group({
     nom: ['', Validators.required],
@@ -194,6 +233,7 @@ export class MembersListComponent implements OnInit {
     cotisationPayee: [0, [Validators.required, Validators.min(0)]],
     cotisationDue: [DEFAULT_COTISATION_DUE, [Validators.required, Validators.min(0)]],
     FBI: [false],
+    notes: [''],
   });
 
   ngOnInit(): void {
@@ -284,6 +324,7 @@ export class MembersListComponent implements OnInit {
       cotisationPayee: member.cotisationPayee,
       cotisationDue: member.cotisationDue,
       FBI: member.FBI,
+      notes: member.notes ?? '',
     });
     this.panelOpen.set(true);
   }
@@ -313,6 +354,7 @@ export class MembersListComponent implements OnInit {
       cotisationPayee: Number(v.cotisationPayee) || 0,
       cotisationDue: Number(v.cotisationDue) || 0,
       FBI: v.FBI ?? false,
+      notes: v.notes ?? '',
     };
 
     const id = this.editingId();

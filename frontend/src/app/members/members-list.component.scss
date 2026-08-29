@@ -25,6 +25,26 @@
   }
 }
 
+.note-info-btn {
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.note-tooltip {
+  position: fixed;
+  z-index: 1070;
+  max-width: 320px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #212529;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
 .sexe-switch {
   .btn {
     min-width: 3.5rem;

@@ -43,12 +43,13 @@ function rowToMember(row) {
     cotisationPayee: Number(row.cotisation_payee),
     cotisationDue: Number(row.cotisation_due),
     FBI: row.fbi,
+    notes: row.notes ?? '',
   };
 }
 
 const MEMBER_FIELDS = [
   'nom', 'prenom', 'sexe', 'dateNaissance', 'categorie',
-  'email', 'telephone', 'cotisationPayee', 'cotisationDue', 'FBI',
+  'email', 'telephone', 'cotisationPayee', 'cotisationDue', 'FBI', 'notes',
 ];
 
 function sanitizeMemberInput(body) {
@@ -84,16 +85,16 @@ app.post('/api/members', async (req, res) => {
   const member = {
     id: crypto.randomUUID(),
     sexe: '', dateNaissance: '', categorie: '', email: '', telephone: '',
-    cotisationPayee: 0, cotisationDue: 0, FBI: false,
+    cotisationPayee: 0, cotisationDue: 0, FBI: false, notes: '',
     ...data,
   };
   try {
     await pool.query(
       `INSERT INTO members
-        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, fbi)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        (id, nom, prenom, sexe, date_naissance, categorie, email, telephone, cotisation_payee, cotisation_due, fbi, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [member.id, member.nom, member.prenom, member.sexe, member.dateNaissance, member.categorie,
-        member.email, member.telephone, member.cotisationPayee, member.cotisationDue, member.FBI],
+        member.email, member.telephone, member.cotisationPayee, member.cotisationDue, member.FBI, member.notes],
     );
     res.status(201).json({ member });
   } catch (err) {
@@ -113,11 +114,11 @@ app.put('/api/members/:id', async (req, res) => {
     const { rows } = await pool.query(
       `UPDATE members SET
         nom = $2, prenom = $3, sexe = $4, date_naissance = $5, categorie = $6,
-        email = $7, telephone = $8, cotisation_payee = $9, cotisation_due = $10, fbi = $11
+        email = $7, telephone = $8, cotisation_payee = $9, cotisation_due = $10, fbi = $11, notes = $12
        WHERE id = $1
        RETURNING *`,
       [req.params.id, updated.nom, updated.prenom, updated.sexe, updated.dateNaissance, updated.categorie,
-        updated.email, updated.telephone, updated.cotisationPayee, updated.cotisationDue, updated.FBI],
+        updated.email, updated.telephone, updated.cotisationPayee, updated.cotisationDue, updated.FBI, updated.notes],
     );
     res.json({ member: rowToMember(rows[0]) });
   } catch (err) {

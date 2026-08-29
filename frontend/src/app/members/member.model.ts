@@ -24,6 +24,7 @@ export interface Member {
   cotisationPayee: number;
   cotisationDue: number;
   FBI: boolean;
+  notes: string;
 }
 
 export type MemberInput = Omit<Member, 'id'>;
@@ -40,5 +41,6 @@ export function emptyMember(): MemberInput {
     cotisationPayee: 0,
     cotisationDue: DEFAULT_COTISATION_DUE,
     FBI: false,
+    notes: '',
   };
 }

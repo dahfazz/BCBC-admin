@@ -213,12 +213,28 @@
           @for (member of sortedMembers(); track member.id) {
           <tr>
             <td class="text-truncate">
-              <button type="button"
-                class="btn btn-link p-0 text-black text-decoration-none member-name-btn d-flex align-items-center"
-                (click)="openMemberPanel(member)">
-                <span class="text-black">{{ member.prenom }} {{ member.nom }}</span>
-                <span class="ms-2 text-black fw-bolder">{{ member.sexe === 'F' ? '♀' : '♂' }}</span>
-              </button>
+              <div class="d-flex align-items-center position-relative">
+                <button type="button"
+                  class="btn btn-link p-0 text-black text-decoration-none member-name-btn d-flex align-items-center"
+                  (click)="openMemberPanel(member)">
+                  <span class="text-black">{{ member.prenom }} {{ member.nom }}</span>
+                  <span class="ms-2 text-black fw-bolder">{{ member.sexe === 'F' ? '♀' : '♂' }}</span>
+                </button>
+                @if (member.notes && member.notes.trim()) {
+                <button type="button" class="btn btn-link p-0 ms-2 lh-1 note-info-btn" title="Voir la note"
+                  aria-label="Voir la note" (click)="toggleNote(member.id, $event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-primary"
+                    viewBox="0 0 16 16" aria-hidden="true">
+                    <path
+                      d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                  </svg>
+                </button>
+                @if (openNoteId() === member.id) {
+                <div class="note-tooltip" role="tooltip" [style.top.px]="notePos()?.top"
+                  [style.left.px]="notePos()?.left" (click)="$event.stopPropagation()">{{ member.notes }}</div>
+                }
+                }
+              </div>
             </td>
             <td class="text-truncate text-center" style="max-width: 130px;">
               @if (!member.dateNaissance) {
@@ -303,8 +319,27 @@
       </table>
     </div>
   </div>
-  <div class="text-primary border-top p-3 small mt-3">
-    {{ summary().total }} ligne(s)
+  <div class="d-flex align-items-center justify-content-between border-top p-3 small mt-3">
+    <span class="text-primary">{{ summary().total }} ligne(s)</span>
+    <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2"
+      [disabled]="displayedEmails().length === 0" (click)="copyAllEmails()">
+      @if (copiedAllEmails()) {
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="text-success"
+        viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+      </svg>
+      Copié
+      } @else {
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"
+        aria-hidden="true">
+        <path
+          d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H6z" />
+        <path d="M2 5a1 1 0 0 0-1 1v8a2 2 0 0 0 2 2h8a1 1 0 0 0 1-1H3a1 1 0 0 1-1-1V5z" />
+      </svg>
+      Copier les emails ({{ displayedEmails().length }})
+      }
+    </button>
   </div>
 </div>
 
@@ -383,6 +418,11 @@
             <input type="checkbox" class="btn-check" formControlName="FBI" id="fbi-check" autocomplete="off">
             <label class="btn btn-outline-primary" for="fbi-check">{{ form.controls.FBI.value ? '✓' : '✗' }}</label>
           </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" formControlName="notes" rows="4"
+            placeholder="Note libre sur l'adhérent…"></textarea>
         </div>
       </div>
     </div>

@@ -24,12 +24,14 @@ async function initDb() {
       telephone TEXT NOT NULL DEFAULT '',
       cotisation_payee NUMERIC NOT NULL DEFAULT 0,
       cotisation_due NUMERIC NOT NULL DEFAULT 0,
-      fbi BOOLEAN NOT NULL DEFAULT false
+      fbi BOOLEAN NOT NULL DEFAULT false,
+      notes TEXT NOT NULL DEFAULT ''
     );
   `);
 
   await pool.query(`ALTER TABLE members DROP COLUMN IF EXISTS numero_licence_ffbb;`);
   await pool.query(`ALTER TABLE members ADD COLUMN IF NOT EXISTS fbi BOOLEAN NOT NULL DEFAULT false;`);
+  await pool.query(`ALTER TABLE members ADD COLUMN IF NOT EXISTS notes TEXT NOT NULL DEFAULT '';`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS treasury_items (
