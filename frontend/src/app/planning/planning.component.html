@@ -45,20 +45,25 @@
             <div class="hour-line" [style.top.px]="hourOffset(h)"></div>
             }
             @for (session of day.sessions; track session.id) {
-            <button type="button" class="event-block" [ngStyle]="eventStyle(session)"
-              [ngClass]="session.type === 'match' ? 'event-match' : 'event-training'" (click)="openEditEvent(session)">
-              <div class="event-time">{{ session.startTime }}–{{ session.endTime }}</div>
-              <div class="event-label text-truncate">{{ session.label }}</div>
-              @if (session.type === 'match') {
-              <div class="event-opponent text-truncate">vs {{ session.opponent }}</div>
-              @if (session.scoreFor !== null && session.scoreFor !== undefined && session.scoreAgainst !== null &&
-              session.scoreAgainst !== undefined) {
-              <div class="event-score">{{ session.scoreFor }} – {{ session.scoreAgainst }}</div>
-              }
-              } @else if (session.coach) {
-              <div class="event-coach text-truncate">{{ session.coach }}</div>
-              }
-            </button>
+            <div class="event-block" [ngStyle]="eventStyle(session)"
+              [ngClass]="session.type === 'match' ? 'event-match' : 'event-training'">
+              <button type="button" class="event-body" (click)="openEditEvent(session)"
+                title="Modifier l’événement">
+                <div class="event-time">{{ session.startTime }}–{{ session.endTime }}</div>
+                <div class="event-label text-truncate">{{ session.label }}</div>
+                @if (session.type === 'match') {
+                <div class="event-opponent text-truncate">vs {{ session.opponent }}</div>
+                @if (session.scoreFor !== null && session.scoreFor !== undefined && session.scoreAgainst !== null &&
+                session.scoreAgainst !== undefined) {
+                <div class="event-score">{{ session.scoreFor }} – {{ session.scoreAgainst }}</div>
+                }
+                } @else if (session.coach) {
+                <div class="event-coach text-truncate">{{ session.coach }}</div>
+                }
+              </button>
+              <button type="button" class="event-delete" aria-label="Supprimer l’événement"
+                title="Supprimer l’événement" (click)="confirmDelete(session)">×</button>
+            </div>
             }
           </div>
           <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2"
