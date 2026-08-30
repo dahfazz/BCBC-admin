@@ -20,6 +20,12 @@
   }
 }
 
+.current-week {
+  border: 2px solid var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15) !important;
+  scroll-margin-top: 1rem;
+}
+
 // ── Vue grille hebdomadaire ─────────────────────────────────────────────
 .week-grid {
   overflow-x: auto;

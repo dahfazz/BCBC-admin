@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PageNavComponent } from '../shared/page-nav.component';
@@ -54,7 +54,7 @@ function toDisplayTime(inputValue: string): string {
   templateUrl: './planning.component.html',
   styleUrl: './planning.component.scss',
 })
-export class PlanningComponent implements OnInit {
+export class PlanningComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private notesService = inject(PlanningNotesService);
   private eventsService = inject(PlanningEventsService);
@@ -99,6 +99,20 @@ export class PlanningComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEvents();
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      document
+        .getElementById('current-week')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  isCurrentWeek(week: PlanningWeek): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today >= week.weekStart && today <= week.weekEnd;
   }
 
   loadEvents(): void {

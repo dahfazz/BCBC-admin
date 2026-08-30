@@ -15,9 +15,14 @@
 
   <div class="planning-weeks d-flex flex-column gap-3">
     @for (week of weeks(); track week.weekStart.getTime()) {
-    <div class="card shadow-sm">
+    <div class="card shadow-sm" [class.current-week]="isCurrentWeek(week)"
+      [attr.id]="isCurrentWeek(week) ? 'current-week' : null">
       <div class="card-header bg-white fw-semibold d-flex align-items-center justify-content-between">
-        <span>{{ formatWeekRange(week) }}</span>
+        <span>{{ formatWeekRange(week) }}
+          @if (isCurrentWeek(week)) {
+          <span class="badge bg-primary ms-2">Semaine en cours</span>
+          }
+        </span>
         <button type="button" class="btn btn-sm btn-primary" (click)="openAddEvent(week)">+ Ajouter un
           événement</button>
       </div>
