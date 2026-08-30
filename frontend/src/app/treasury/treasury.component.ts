@@ -53,7 +53,38 @@ export class TreasuryComponent implements OnInit {
   depenses = signal<TreasuryItem[]>([]);
   recettes = signal<TreasuryItem[]>([]);
 
-  totalDepenses = computed(() => this.depenses().reduce((sum, i) => sum + i.amount, 0));
+  // Coût d'une licence par catégorie (€ / adhérent)
+  private readonly LICENSE_RATES: Record<string, number> = {
+    U7: 39,
+    U9: 39,
+    U11: 39,
+    U13: 50,
+    FSGT: 42,
+    LOISIR: 56.5,
+  };
+
+  licenceDepenses = computed(() => {
+    const counts = new Map<string, number>();
+    for (const m of this.members()) {
+      if (!(m.categorie in this.LICENSE_RATES)) continue;
+      counts.set(m.categorie, (counts.get(m.categorie) ?? 0) + 1);
+    }
+    return ['U7', 'U9', 'U11', 'U13', 'FSGT', 'LOISIR']
+      .filter((cat) => counts.has(cat))
+      .map((cat) => {
+        const count = counts.get(cat)!;
+        const rate = this.LICENSE_RATES[cat];
+        return { label: `Achat licences ${cat}`, count, rate, amount: count * rate };
+      });
+  });
+
+  totalLicenceDepenses = computed(() =>
+    this.licenceDepenses().reduce((sum, i) => sum + i.amount, 0),
+  );
+
+  totalDepenses = computed(
+    () => this.depenses().reduce((sum, i) => sum + i.amount, 0) + this.totalLicenceDepenses(),
+  );
   totalRecettesManuelles = computed(() => this.recettes().reduce((sum, i) => sum + i.amount, 0));
   totalRecettes = computed(() => this.cotisationSummary().total + this.totalRecettesManuelles());
   solde = computed(() => this.totalRecettes() - this.totalDepenses());
