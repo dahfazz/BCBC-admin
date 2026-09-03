@@ -2,7 +2,7 @@ const path = require('path');
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getAuth } = require('firebase-admin/auth');
 
-const ALLOWED_EMAILS = ['fabien.zibi@gmail.com', 'bcbc92270@gmail.com', 'baaamadou928@gmail.com'];
+const ALLOWED_EMAILS = ['fabien.zibi@gmail.com', 'bcbc92270@gmail.com', 'baaamadou928@gmail.com', 'hassen-92@live.fr'];
 
 function loadServiceAccount() {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {

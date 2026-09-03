@@ -10,7 +10,7 @@ import {
 } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 
-const ALLOWED_EMAILS = ['fabien.zibi@gmail.com', 'bcbc92270@gmail.com', 'baaamadou928@gmail.com'];
+const ALLOWED_EMAILS = ['fabien.zibi@gmail.com', 'bcbc92270@gmail.com', 'baaamadou928@gmail.com', 'hassen-92@live.fr'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
