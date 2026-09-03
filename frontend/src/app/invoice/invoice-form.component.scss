@@ -62,3 +62,30 @@
 .modal.d-block {
   z-index: 1060;
 }
+
+// ── Mobile / tablette : la barre latérale des factures passe sous le formulaire ──
+@media (max-width: 991.98px) {
+  :host {
+    padding-right: 0;
+  }
+
+  .invoices-sidebar {
+    position: static;
+    width: auto;
+    max-height: 60vh;
+    border-left: 0 !important;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .fixed-footer {
+    right: 0;
+  }
+
+  .fixed-footer .container {
+    justify-content: center;
+  }
+
+  .fixed-footer .btn {
+    width: 100%;
+  }
+}

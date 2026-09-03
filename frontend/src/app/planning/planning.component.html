@@ -1,13 +1,14 @@
-<header class="text-white p-5 bg-primary d-flex justify-content-between align-items-center">
+<header
+  class="text-white p-3 p-md-5 bg-primary d-flex flex-column flex-md-row gap-3 gap-md-0 justify-content-between align-items-start align-items-md-center">
   <div class="d-flex align-items-center">
     <div>
       <h1 class="mb-0">Planning</h1>
     </div>
   </div>
-  <app-page-nav class="ms-auto"></app-page-nav>
+  <app-page-nav class="ms-md-auto"></app-page-nav>
 </header>
 
-<div class="p-5 pt-1">
+<div class="p-3 p-md-5 pt-1">
 
   @if (loadError()) {
   <div class="alert alert-warning">{{ loadError() }}</div>
@@ -17,7 +18,7 @@
     @for (week of weeks(); track week.weekStart.getTime()) {
     <div class="card shadow-sm" [class.current-week]="isCurrentWeek(week)"
       [attr.id]="isCurrentWeek(week) ? 'current-week' : null">
-      <div class="card-header bg-white fw-semibold d-flex align-items-center justify-content-between">
+      <div class="card-header bg-white fw-semibold d-flex flex-wrap gap-2 align-items-center justify-content-between">
         <span>{{ formatWeekRange(week) }}
           @if (isCurrentWeek(week)) {
           <span class="badge bg-primary ms-2">Semaine en cours</span>

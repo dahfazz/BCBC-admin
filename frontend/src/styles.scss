@@ -42,3 +42,20 @@ body {
   color: var(--bs-primary);
   background-color: rgba(var(--bs-primary-rgb), .1);
 }
+
+// ── Adaptations mobile ─────────────────────────────────────────────
+@media (max-width: 767.98px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  // Panneau latéral (adhérent / événement) : plein écran sur mobile
+  .member-panel {
+    width: 100vw !important;
+  }
+}
