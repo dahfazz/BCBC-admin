@@ -10,7 +10,7 @@ import { Member, CATEGORIES, categoryLabel } from '../members/member.model';
   selector: 'app-invoice-form',
   imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './invoice-form.component.html',
-  styleUrl: './invoice-form.component.scss'
+  styleUrl: './invoice-form.component.scss',
 })
 export class InvoiceFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -33,7 +33,7 @@ export class InvoiceFormComponent implements OnInit {
   filteredInvoices = computed(() => {
     const term = this.invoiceSearch().trim().toLowerCase();
     const files = this.invoices();
-    return term ? files.filter(f => f.toLowerCase().includes(term)) : files;
+    return term ? files.filter((f) => f.toLowerCase().includes(term)) : files;
   });
 
   // Nom/prénom du parent connus pour les factures générées pendant cette session
@@ -53,22 +53,22 @@ export class InvoiceFormComponent implements OnInit {
   }
 
   form = this.fb.group({
-    invoiceNumber:    [{ value: '', disabled: true }],
-    season:           ['2026-27', Validators.required],
-    date:             [this.todayStr(), Validators.required],
-    parentLastName:   ['', Validators.required],
-    parentFirstName:  ['', Validators.required],
-    parentAddress:    ['', Validators.required],
+    invoiceNumber: [{ value: '', disabled: true }],
+    season: ['2026-27', Validators.required],
+    date: [this.todayStr(), Validators.required],
+    parentLastName: [''],
+    parentFirstName: [''],
+    parentAddress: ['', Validators.required],
     parentPostalCode: ['92270', Validators.required],
-    parentCity:       ['Bois-Colombes', Validators.required],
-    childLastName:    ['', Validators.required],
-    childFirstName:   ['', Validators.required],
+    parentCity: ['Bois-Colombes', Validators.required],
+    childLastName: ['', Validators.required],
+    childFirstName: ['', Validators.required],
     formulaStartDate: ['2026-09-01', Validators.required],
-    formulaEndDate:   ['2027-07-31', Validators.required],
-    section:          ['', Validators.required],
-    paymentMethod:    ['CB en ligne', Validators.required],
-    amountPaid:       [260, [Validators.required, Validators.min(0)]],
-    presidentName:    ['Amadou BA', Validators.required],
+    formulaEndDate: ['2027-07-31', Validators.required],
+    section: ['', Validators.required],
+    paymentMethod: ['CB en ligne', Validators.required],
+    amountPaid: [260, [Validators.required, Validators.min(0)]],
+    presidentName: ['Amadou BA', Validators.required],
   });
 
   ngOnInit(): void {
@@ -81,7 +81,7 @@ export class InvoiceFormComponent implements OnInit {
     if (memberId) {
       this.memberService.list().subscribe({
         next: (res) => {
-          const member = res.members.find(m => m.id === memberId) ?? null;
+          const member = res.members.find((m) => m.id === memberId) ?? null;
           this.selectedMember.set(member);
           if (member) {
             this.form.patchValue({
@@ -92,7 +92,7 @@ export class InvoiceFormComponent implements OnInit {
             });
           }
         },
-        error: () => {}
+        error: () => {},
       });
     }
   }
@@ -100,7 +100,7 @@ export class InvoiceFormComponent implements OnInit {
   loadInvoices(): void {
     this.invoiceService.listInvoices().subscribe({
       next: (res) => this.invoices.set(res.files.sort().reverse()),
-      error: () => {}
+      error: () => {},
     });
   }
 
@@ -127,25 +127,25 @@ export class InvoiceFormComponent implements OnInit {
     const v = this.form.getRawValue() as Record<string, unknown>;
 
     const data = {
-      invoiceNumber:     String(v['invoiceNumber']),
-      season:            String(v['season']),
-      date:              this.formatDate(String(v['date'])),
-      parentLastName:    String(v['parentLastName']),
-      parentFirstName:   String(v['parentFirstName']),
-      parentAddress:     String(v['parentAddress']),
-      parentPostalCode:  String(v['parentPostalCode']),
-      parentCity:        String(v['parentCity']),
-      childLastName:     String(v['childLastName']),
-      childFirstName:    String(v['childFirstName']),
-      formulaStartDate:  this.formatDate(String(v['formulaStartDate'])),
-      formulaEndDate:    this.formatDate(String(v['formulaEndDate'])),
-      section:           String(v['section']),
-      product:           String(v['product']),
-      productPrice:      Number(v['productPrice']),
-      timeSlot:          String(v['timeSlot']),
-      paymentMethod:     String(v['paymentMethod']),
-      amountPaid:        Number(v['amountPaid']),
-      presidentName:     String(v['presidentName']),
+      invoiceNumber: String(v['invoiceNumber']),
+      season: String(v['season']),
+      date: this.formatDate(String(v['date'])),
+      parentLastName: String(v['parentLastName']),
+      parentFirstName: String(v['parentFirstName']),
+      parentAddress: String(v['parentAddress']),
+      parentPostalCode: String(v['parentPostalCode']),
+      parentCity: String(v['parentCity']),
+      childLastName: String(v['childLastName']),
+      childFirstName: String(v['childFirstName']),
+      formulaStartDate: this.formatDate(String(v['formulaStartDate'])),
+      formulaEndDate: this.formatDate(String(v['formulaEndDate'])),
+      section: String(v['section']),
+      product: String(v['product']),
+      productPrice: Number(v['productPrice']),
+      timeSlot: String(v['timeSlot']),
+      paymentMethod: String(v['paymentMethod']),
+      amountPaid: Number(v['amountPaid']),
+      presidentName: String(v['presidentName']),
     };
 
     const doc = this.invoiceService.buildPDF(data);
@@ -168,7 +168,7 @@ export class InvoiceFormComponent implements OnInit {
         window.open(doc.output('bloburl'), '_blank');
         this.error.set('Serveur non disponible. PDF ouvert localement uniquement.');
         this.saving.set(false);
-      }
+      },
     });
   }
 
@@ -193,7 +193,7 @@ export class InvoiceFormComponent implements OnInit {
     this.emailTo.set('');
     this.emailSubject.set('Votre facture Bois-Colombes Basket 2026-27');
     this.emailBody.set(
-      `${greeting},\n\nVeuillez trouver ci-joint la facture.\n\nL'équipe de BC Basket`
+      `${greeting},\n\nVeuillez trouver ci-joint la facture.\n\nL'équipe de BC Basket`,
     );
     this.emailError.set('');
     this.emailSent.set(false);
@@ -224,7 +224,7 @@ export class InvoiceFormComponent implements OnInit {
         error: (err) => {
           this.emailSending.set(false);
           this.emailError.set(err?.error?.error ?? "Échec de l'envoi de l'email.");
-        }
+        },
       });
   }
 }

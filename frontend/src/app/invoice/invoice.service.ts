@@ -33,14 +33,19 @@ export class InvoiceService {
 
   constructor() {
     fetch('/tampon.png')
-      .then(r => r.blob())
-      .then(blob => new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      }))
-      .then(dataUrl => { this.tamponBase64 = dataUrl; })
+      .then((r) => r.blob())
+      .then(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }),
+      )
+      .then((dataUrl) => {
+        this.tamponBase64 = dataUrl;
+      })
       .catch(() => {});
   }
 
@@ -93,7 +98,10 @@ export class InvoiceService {
     doc.text(`Le ${data.date}`, mR, 41, { align: 'right' });
 
     // ── ADDRESS BOX ──────────────────────────────────────────────────────────
-    const bx = 118, by = 44, bw = 77, bh = 24;
+    const bx = 118,
+      by = 44,
+      bw = 77,
+      bh = 24;
     doc.setLineWidth(0.4);
     doc.rect(bx, by, bw, bh);
     doc.setFont('helvetica', 'normal');
@@ -118,7 +126,9 @@ export class InvoiceService {
 
     const rows: [string, string][] = [
       ['Inscription de :', `${data.childLastName} ${data.childFirstName}`],
-      ['Nom des parents :', `${data.parentLastName} ${data.parentFirstName}`],
+      data.parentLastName
+        ? ['Nom des parents :', `${data.parentLastName} ${data.parentFirstName}`]
+        : ['', ''],
       ['Date formule:', `du ${data.formulaStartDate} au ${data.formulaEndDate}`],
       ['De la section :', data.section],
     ];
@@ -148,7 +158,9 @@ export class InvoiceService {
     doc.setFont('helvetica', 'bold');
     doc.text('Montant réglé :', labelX, y + 5);
 
-    const abX = 88, abW = 62, abH = 13;
+    const abX = 88,
+      abW = 62,
+      abH = 13;
     doc.setLineWidth(0.5);
     doc.rect(abX, y, abW, abH);
     doc.setFont('helvetica', 'normal');
@@ -159,7 +171,7 @@ export class InvoiceService {
     y += 26;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Amadou BA, Président de BCS`, labelX, y);
+    doc.text(`Amadou BA, Président de BC Basket`, labelX, y);
 
     // ── BCS STAMP ────────────────────────────────────────────────────────────
     if (this.tamponBase64) {
@@ -179,18 +191,37 @@ export class InvoiceService {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     const fc = pageW / 2;
-    doc.text('Gymnase Charles Coste -  31 Av. du Révérend Père Corentin Cloarec, 92270 Bois-Colombes - TEL : 06 61 54 13 70', fc, fy + 5, { align: 'center' });
+    doc.text(
+      'Gymnase Charles Coste -  31 Av. du Révérend Père Corentin Cloarec, 92270 Bois-Colombes - TEL : 06 61 54 13 70',
+      fc,
+      fy + 5,
+      { align: 'center' },
+    );
     doc.text('Email : bcbc92270@gmail.com', fc, fy + 10, { align: 'center' });
-    doc.text("Numéro SIRET : 919 540 211 00019 | Numéro d'affiliation FFBB : IDF0092061", fc, fy + 15, { align: 'center' });
+    doc.text(
+      "Numéro SIRET : 919 540 211 00019 | Numéro d'affiliation FFBB : IDF0092061",
+      fc,
+      fy + 15,
+      { align: 'center' },
+    );
 
     return doc;
   }
 
-  saveToServer(doc: jsPDF, data: InvoiceData): Observable<{ success: boolean; filename: string; path: string }> {
-    const lastName = data.parentLastName.toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z_]/g, '');
+  saveToServer(
+    doc: jsPDF,
+    data: InvoiceData,
+  ): Observable<{ success: boolean; filename: string; path: string }> {
+    const lastName = data.parentLastName
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z_]/g, '');
     const filename = `RECU_${data.invoiceNumber}_${lastName}.pdf`;
     const pdfBase64 = doc.output('datauristring').split(',')[1];
-    return this.http.post<{ success: boolean; filename: string; path: string }>(this.API, { pdfBase64, filename });
+    return this.http.post<{ success: boolean; filename: string; path: string }>(this.API, {
+      pdfBase64,
+      filename,
+    });
   }
 
   listInvoices(): Observable<{ files: string[] }> {
@@ -201,7 +232,17 @@ export class InvoiceService {
     return `${this.BASE}/invoices/${encodeURIComponent(filename)}`;
   }
 
-  sendInvoiceEmail(filename: string, to: string, subject: string, body: string): Observable<{ success: boolean }> {
-    return this.http.post<{ success: boolean }>(`${this.BASE}/api/send-invoice-email`, { filename, to, subject, body });
+  sendInvoiceEmail(
+    filename: string,
+    to: string,
+    subject: string,
+    body: string,
+  ): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.BASE}/api/send-invoice-email`, {
+      filename,
+      to,
+      subject,
+      body,
+    });
   }
 }
