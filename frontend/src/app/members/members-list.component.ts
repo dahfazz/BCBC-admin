@@ -1,5 +1,4 @@
 import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MemberService } from './member.service';
@@ -13,6 +12,7 @@ import {
 } from './member.model';
 import { PageNavComponent } from '../shared/page-nav.component';
 import { DEFAULT_COTISATION_DUE } from '../app';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-members-list',
@@ -99,6 +99,11 @@ export class MembersListComponent implements OnInit {
     return list;
   });
 
+  public sold(): void {
+    this.form.controls.cotisationDue.setValue(0);
+    this.form.controls.cotisationPayee.setValue(DEFAULT_COTISATION_DUE);
+  }
+
   private compareMembers(a: Member, b: Member, key: string): number {
     switch (key) {
       case 'dateNaissance': {
@@ -184,13 +189,13 @@ export class MembersListComponent implements OnInit {
   copiedField = signal<{ id: string; field: 'telephone' | 'email' } | null>(null);
   copiedAllEmails = signal(false);
 
-  displayedEmails = computed(() =>
-    [...new Set(
+  displayedEmails = computed(() => [
+    ...new Set(
       this.sortedMembers()
         .map((m) => m.email.trim())
         .filter((e) => e.length > 0),
-    )],
-  );
+    ),
+  ]);
 
   copyAllEmails(): void {
     const emails = this.displayedEmails();

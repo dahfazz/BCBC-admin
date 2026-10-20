@@ -412,6 +412,7 @@
           <label class="form-label">Cotisation payée (€) <span class="text-danger">*</span></label>
           <input type="number" class="form-control" formControlName="cotisationPayee" min="0" step="0.01"
             [class.is-invalid]="isInvalid('cotisationPayee')">
+            <button type="button" class="btn btn-outline-secondary" (click)="sold()">Solder</button>
           <div class="invalid-feedback">Valeur invalide</div>
         </div>
         <div class="col-md-6">
